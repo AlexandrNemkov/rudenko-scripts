@@ -1,0 +1,164 @@
+<!-- Как сделать аккордеон из нескольких ZeroBlock в Tilda mo-ti.ru --><script src="https://static.tildacdn.com/js/jquery-1.10.2.min.js" charset="utf-8" onerror="this.loaderr='y';"></script><script>
+$( document ).ready(function() {
+    
+    $(function () { 
+        let liter = 'a'; //Литера для сборки
+        let oneAcc = true; // Открывать по одной вкладке  false - true
+        let accOpen = true; // Открытая  вкладка  false - true
+        let openNum = 0; // Номер открытой вкладки (0 — первая)
+        let scroll = false; // Скролл к открытой вкладке  false - true
+        
+        $('.accord-icon').addClass('accord');
+    
+        $('div[class*="uc-accord-'+liter+'"]').each(function(index){
+            $('.uc-accord-'+liter+'-'+index+':first').addClass('title-accord').attr('data-accord-index', index);
+            $('.uc-accord-'+liter+'-'+index+'').not(':first').addClass('content-accord hide-accord');
+            
+        });
+        
+        if(accOpen){
+            $('div.title-accord.uc-accord-'+liter+'-'+openNum).addClass('active-accord font40');
+            $('div.content-accord.uc-accord-'+liter+'-'+openNum).removeClass('hide-accord');
+        };
+        
+        setTimeout(function(){ $('.content-accord').addClass('time-step')}, 1500);
+    
+        function videoStop(){
+            setTimeout(function(){ 
+                $('div.content-accord.hide-accord[class*="uc-accord-'+liter+'-"]').each(function(){
+                    let videoNum = $(this).find('div[data-elem-type="video"]').length;
+                    if(videoNum){
+                        $(this).find('div[data-elem-type="video"]').each(function(){
+                            $(this).find('iframe').attr( 'src', function ( i, val ) { return val; });
+                        });    
+                    };
+                });
+            }, 300);
+        };
+        
+        // Автокоррекция высоты заголовка при изменении размера шрифта (класс font40)
+        function adjustTitleHeight($title){
+            if(!$title || !$title.length) return;
+            // Считаем высоту ТОЛЬКО по реальным элементам заголовка: текст, номер, иконка
+            const pad = 2; // небольшой запас
+            const extra = $title.hasClass('font40') ? 24 : 0; // доп. нижний отступ
+            const contRect = $title[0].getBoundingClientRect();
+            let maxBottom = 0;
+            // Текстовые элементы
+            $title.find('.t396__elem[data-elem-type="text"]').each(function(){
+                const atom = $(this).find('.tn-atom')[0] || this;
+                const r = atom.getBoundingClientRect();
+                const bottom = r.bottom - contRect.top;
+                if(bottom > maxBottom) maxBottom = bottom;
+            });
+            // Номер и иконка, если они в структуре заголовка
+            $title.find('.acc-num, .accord-icon').each(function(){
+                const r = this.getBoundingClientRect();
+                const bottom = r.bottom - contRect.top;
+                if(bottom > maxBottom) maxBottom = bottom;
+            });
+            if(maxBottom > 0){
+                $title.css('min-height', Math.ceil(maxBottom + pad + extra) + 'px');
+            }
+        }
+        function adjustAllTitles(){
+            $('div.title-accord[class*="uc-accord-'+liter+'"]').each(function(){
+                const $t = $(this);
+                if($t.hasClass('font40')){
+                    adjustTitleHeight($t);
+                } else {
+                    $t.css('min-height', '');
+                }
+            });
+        }
+        // Дебаунс ресайза
+        let resizeTm;
+        $(window).on('resize', function(){
+            clearTimeout(resizeTm);
+            resizeTm = setTimeout(adjustAllTitles, 150);
+        });
+    
+        $('div[class*="uc-accord-'+liter+'"]').find('.accord').click(function(e){
+            let cT = $(this).closest('.title-accord');
+            let ind = cT.attr('data-accord-index');
+            
+            
+            if(oneAcc){
+                //По одной  вкладке
+                if( cT.hasClass('active-accord') ){
+                    // запрещаем закрывать последний открытый пункт
+                    return;
+                }else{
+                    $('div.title-accord[class*="uc-accord-'+liter+'"]').removeClass('active-accord');
+                    $('div.title-accord[class*="uc-accord-'+liter+'"]').removeClass('font40').css('min-height','');
+                    cT.addClass('active-accord');
+                    cT.addClass('font40'); // увеличить шрифт и скрыть линию
+                    $('div.content-accord[class*="uc-accord-'+liter+'-"]').addClass('hide-accord');
+                    $('div.content-accord.uc-accord-'+liter+'-'+ind+'').removeClass('hide-accord');  
+                    videoStop();
+                };
+         
+            }else{
+                //По несколько вкладок
+                cT.toggleClass('active-accord');
+                cT.toggleClass('font40');
+                $('div.content-accord.uc-accord-'+liter+'-'+ind+'').toggleClass('hide-accord');  
+                videoStop();
+                if(!cT.hasClass('font40')){ cT.css('min-height',''); }
+            };
+            // После применения/снятия font40 даём браузеру дорисовать, затем считаем высоту
+            setTimeout(function(){ adjustTitleHeight(cT); }, 0);
+            
+            // Меняем фотографию при клике на аккордеон
+            switchAccordPhoto(parseInt(ind));
+            
+                if(scroll){ //скролл до вкладки
+                let el = $(this).closest('.r');
+                setTimeout(function(){
+                    $('html, body').animate({scrollTop:  el.offset().top-50   }, 400);
+                }, 600);
+            };
+    
+        });
+        
+        // Функция смены фотографий аккордеона
+        function switchAccordPhoto(accordIndex) {
+            // Скрываем все фотографии
+            $('.photo-accord-a-1, .photo-accord-a-2, .photo-accord-a-3, .photo-accord-a-4').hide();
+            // Показываем нужную фотографию (индекс начинается с 0, поэтому +1)
+            $('.photo-accord-a-' + (accordIndex + 1)).show();
+        }
+        
+        // Первичная корректировка высот заголовков
+        setTimeout(adjustAllTitles, 0);
+        
+    });
+          
+    });
+    </script>
+    
+    <style>
+    .hide-accord .t396__artboard {
+        height: 0!important;
+        pointer-events: none!important;
+        overflow: hidden!important;
+    }    
+    .content-accord.time-step .t396__artboard , .accord-icon {   transition: all 0.4s ease-in-out}    
+    .content-accord {
+        padding-top: 0!important;
+        padding-bottom: 0!important;
+    }
+    .content-accord.hide-accord { padding-top: 0!important; }
+    /*.content-accord:not(.hide-accord) { padding-top: 48px!important; background-color: #131313 !important; } /* стабильный отступ 48px и тёмный фон */
+    .active-accord .accord-icon {  transform: rotate(180deg)}
+    .accord {  cursor: pointer}
+    /* Увеличение размера заголовка и скрытие линии при активном пункте */
+    .title-accord .t396__elem .tn-atom { line-height: 1.1 !important; } /* фиксируем межстрочный интервал, чтобы не было прыжка */
+    .title-accord.font40 .t396__elem .tn-atom { font-size: 40px !important; line-height: 1.1 !important; }
+    .title-accord.font40 .accord-line { display: none !important; }
+    /* Выравнивание номера вправо (класс навешиваем из JS автоматически) */
+    .title-accord .acc-num { text-align: right !important; display: block; }
+    /* Даем текстовым оберткам расти по высоте при увеличении шрифта */
+    .title-accord.font40 .t396__elem[data-elem-type="text"] { height: auto !important; }
+    .title-accord.font40 .t396__elem[data-elem-type="text"] .tn-atom { height: auto !important; display: block !important; }
+    </style>

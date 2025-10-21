@@ -1,0 +1,92 @@
+<style>
+/* Стили для темных блоков */
+.menuhamelion.dark-section {
+    background-color: #ffffff;
+}
+
+/* Стили для светлых блоков */
+.menuhamelion.light-section {
+    background-color: #131313;
+}
+</style>
+
+<script>
+
+// Функция для определения цвета фона в точке 100px от верха, слева с края
+function getBackgroundColorAtPoint() {
+    const x = 0; // Самая левая точка
+    const y = 100; // 100px от верха
+    
+    const elementBelow = document.elementFromPoint(x, y);
+    if (!elementBelow) return 'rgb(255, 255, 255)';
+    
+    // Ищем непрозрачный фон
+    let currentElement = elementBelow;
+    for (let i = 0; i < 10; i++) {
+        const bgColor = window.getComputedStyle(currentElement).backgroundColor;
+        
+        if (bgColor !== 'rgba(0, 0, 0, 0)' && bgColor !== 'transparent') {
+            return bgColor;
+        }
+        
+        currentElement = currentElement.parentElement;
+        if (!currentElement) break;
+    }
+    
+    return 'rgb(255, 255, 255)';
+}
+
+// Функция для проверки, является ли цвет белым
+function isWhiteColor(color) {
+    if (!color) return false;
+    
+    if (color === 'white' || color === '#ffffff' || color === '#fff' || color === 'rgb(255, 255, 255)') {
+        return true;
+    }
+    
+    const rgb = color.match(/\d+/g);
+    if (!rgb || rgb.length < 3) return false;
+    
+    const r = parseInt(rgb[0]);
+    const g = parseInt(rgb[1]);
+    const b = parseInt(rgb[2]);
+    
+    return r >= 240 && g >= 240 && b >= 240;
+}
+
+// Функция для обновления цвета меню
+function updateMenuColor() {
+    const menuLines = document.querySelectorAll('.menuhamelion');
+    if (!menuLines.length) return;
+    
+    const backgroundColor = getBackgroundColorAtPoint();
+    const isWhite = isWhiteColor(backgroundColor);
+    
+    // Убираем все классы
+    menuLines.forEach(line => {
+        line.classList.remove('dark-section', 'light-section');
+    });
+    
+    // Применяем нужный класс
+    if (isWhite) {
+        // Белый фон - темные полоски
+        menuLines.forEach(line => {
+            line.classList.add('light-section');
+        });
+    } else {
+        // Темный фон - белые полоски
+        menuLines.forEach(line => {
+            line.classList.add('dark-section');
+        });
+    }
+}
+
+// Обновляем цвет меню при скролле
+window.addEventListener('scroll', updateMenuColor);
+
+// Обновляем цвет меню при изменении размера окна
+window.addEventListener('resize', updateMenuColor);
+
+// Обновляем цвет меню при загрузке страницы
+document.addEventListener('DOMContentLoaded', updateMenuColor);
+</script>
