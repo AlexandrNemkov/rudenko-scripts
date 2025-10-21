@@ -78,6 +78,8 @@
                 console.log('Найдено элементов с названиями цветов:', colorFilters.length);
             }
             
+            const foundColorNames = new Set(); // Для отслеживания уже найденных цветов
+            
             colorFilters.forEach((filter, index) => {
                 // Получаем название цвета из различных атрибутов
                 const colorName = filter.getAttribute('data-tooltip') || 
@@ -86,17 +88,21 @@
                                 filter.getAttribute('name') ||
                                 filter.textContent?.trim();
                 
-                if (colorName && colorName !== '') {
+                if (colorName && colorName !== '' && !foundColorNames.has(colorName)) {
+                    foundColorNames.add(colorName);
                     colors.push({
-                        index: index,
+                        index: colors.length, // Используем текущую длину массива colors
                         name: colorName,
                         element: filter
                     });
                 }
             });
             
-            console.log('Найденные цвета в каталоге:', colors);
+            console.log('Найденные цвета в каталоге (без дублей):', colors);
             console.log('Использованный селектор:', usedSelector);
+            console.log('Всего найдено элементов:', colorFilters.length);
+            console.log('Уникальных цветов:', colors.length);
+            console.log('Отфильтровано дублей:', colorFilters.length - colors.length);
             return colors;
         }
         
