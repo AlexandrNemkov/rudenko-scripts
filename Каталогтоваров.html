@@ -1,0 +1,47 @@
+<script>
+    (function(){
+        const zeroblock = document.querySelector('#rec1279145061');
+        const catalog = document.querySelector('#rec1252581816');
+        if (!!catalog) {
+            zeroblock.querySelector('.t396__artboard').addEventListener('artBoardRendered', (e) => {
+                e.target.querySelector('.necodim-showmore').addEventListener('click', (event) => {
+                    event.preventDefault();
+                    zeroblock.querySelector('.necodim-showmore .tn-atom').classList.add('loading');
+                    catalog.querySelector('.t-store__load-more-btn').click();
+                });
+            });
+            catalog.querySelector('.js-store-grid-cont').addEventListener('tStoreRendered', () => {
+                zeroblock.style.display = '';
+                zeroblock.querySelector('.necodim-showmore .tn-atom').classList.remove('loading');
+                if (catalog.querySelector('.t-store__load-more-btn').style.display === 'none') zeroblock.style.display = 'none';
+                if (!!catalog.querySelector('.js-store-empty-part-msg')) zeroblock.style.display = 'none';
+            });
+        } else {
+            zeroblock.style.display = 'none';
+        }
+    }());
+    </script> <style> .t-store__load-more-btn-wrap {
+        display: none;
+    }
+    .necodim-showmore {
+        cursor: pointer;
+    }
+    .necodim-showmore .tn-atom.loading {
+        font-size: 0 !important;
+    }
+    .necodim-showmore .tn-atom.loading::after {
+        content: '';
+        width: 20px;
+        aspect-ratio: 1;
+        border: 2px solid #FFF;
+        border-bottom-color: transparent;
+        border-radius: 50%;
+        display: inline-block;
+        box-sizing: border-box;
+        animation: rotation 1s linear infinite;
+    }
+    @keyframes rotation {
+        0% {transform: rotate(0deg);}
+        100% {transform: rotate(360deg);}
+    }
+    </style>
