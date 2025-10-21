@@ -1,7 +1,5 @@
 <!--NOLIM--><!--NLM150--><!--settings{"comment":"","zeroId":"#rec1450750621","mainShapeClass":"tn-elem__14507506211760890267356","titleSettings":{"class":"tn-elem__1450750621176096459787649250","additional":"fonShapeForTitle150","marginBottom":"64","marginBottomMobile":"0"},"descriptionSettings":{"class":"tn-elem__1450750621176088924800187760","classesForNotClones":"description-title150","additional":"fonShapeForDescription150","marginBottom":"34","marginBottomMobile":"0"},"priceSettings":{"class":"tn-elem__1450750621176088907676191580","textBeforePrice":"","priceCurrency":"  ₽","marginBottom":"32","marginBottomMobile":"0"},"characteristicsSettings":{"classForName":"characteristics-name150","classForValue":"characteristics-value150","classesForClones":"deco-element1, deco-element2","classesForNotClones":"characteristics-title150","additional":"fonShapeForCharacteristics150","padding":"15","marginBottom":"50","marginBottomMobile":"0"},"brandSettings":{"class":"nlm_brand150","marginBottom":"50","marginBottomMobile":"0"},"optionsSettings":{"classForSelect":"class-for-select150","classesForClones":"select-deco-element1, select-deco-element2","classesForNotClones":"options-title150","additional":"fonShapeForSelect","marginBottom":"50","marginBottomMobile":"0"},"gallerySettings":{"class":"tn-elem__14507506211760950710118","marginBottom":"50","marginBottomMobile":"50"},"addToCartBtnSettings":{"class":"tn-elem__14507506211760888749616","marginBottom":"0","marginBottomMobile":"0"},"notAvailableSettings":{"notAvailableCheckbox":"false","notAvailableText":"","notAvailableBtnColor":"#ffffff","notAvailableLink":"#popup:myform","hiddenField":"myInput","myProductLink":"#myProduct"},"addToWishBtnSettings":{"addFavoriteClass":"tn-elem__14507506211760888887430","removeFavoriteClass":"removeFavoriteClassNlm150","classesForNotClones":"favorite-shape150","marginBottom":"50","marginBottomMobile":"50"},"loaderSettings":{"isOffLoader":"1","color":"#ffffff","colorBackground":"#ffffff"}}settingsend--><!--ts1760964698598ts--> 
-
 <script src="https://static.tildacdn.com/js/jquery-1.10.2.min.js" charset="utf-8" onerror="this.loaderr='y';"></script>
-
 <script> 
 window.isAllElemsRendered1450750621 = false; 
 let ab2 = setInterval(function() { 
@@ -21,18 +19,15 @@ let ab2 = setInterval(function() {
         window.t396_allelems__renderView(zeroBlock); 
     } 
 }, 10); 
-
 function n_ready(t) { 
     "loading" != document.readyState ? t() : document.addEventListener ? document.addEventListener("DOMContentLoaded", t) : document.attachEvent("onreadystatechange", function() { 
         "loading" != document.readyState && t() 
     }) 
 }; 
-
 n_ready(function(){ 
     if(1 !== 1) { 
         loaderShow(); 
     } 
-    
     let maxBottom1 = 0; 
     let maxBottom2 = 0; 
     let maxBottomInShape = 0; 
@@ -83,7 +78,6 @@ n_ready(function(){
     let wishButtonMarginBottomMobile = 50; 
     let wishButtonFonShapeClass = "nlm150-wish-button-fon-shape-class"; 
     let mainShape = document.querySelector(zeroId + ' .' + "tn-elem__14507506211760890267356"); 
-    
     let settings1v6h6i5s2n9b6k0s6n7 = { 
         characteristics: { 
             productSelector: '.t-store__prod-snippet__container .t-typography__characteristics', 
@@ -190,7 +184,6 @@ n_ready(function(){
             marginBottomMobile: wishButtonMarginBottomMobile, 
         } 
     }; 
-
     /* Добавляем дополнительные элементы к общему объекту */ 
     function addSelectorToMainObj(selectorsList, notCloneable, type) { 
         if (selectorsList) { 
@@ -207,7 +200,6 @@ n_ready(function(){
     addSelectorToMainObj(optionsNotClonesClassesList, true, "options"); 
     addSelectorToMainObj(descriptionNotClonesClassesList, true, "descriptions"); 
     addSelectorToMainObj(forWishNotClonesClassesList, true, "wishButton"); 
-
     function loaderShow() { 
         const parentNode = document.querySelector('.t-records'); 
         parentNode.insertAdjacentHTML("beforeend", ` 
@@ -218,13 +210,11 @@ n_ready(function(){
             </div> 
         `); 
     } 
-
     function loaderHide() { 
         document.querySelectorAll('.loader__overlay').forEach((el) => { 
             el.remove(); 
         }); 
     } 
-
     function checkZoom3z8g2l3q2q6k2h2r0i8(el) { 
         let myZoom = 1; 
         if (window.isFirefox || window.isOpera) { 
@@ -252,7 +242,6 @@ n_ready(function(){
         } 
         return myZoom; 
     } 
-
     function calculateGroupHeight3j0x2l4s2p4p2n3u4z5(selectors) { 
         let zm = 1; 
         selectors.forEach(function(item) { 
@@ -297,7 +286,6 @@ n_ready(function(){
         } 
         return totalHeight; 
     } 
-
     function increaseHeight5a5r3l8o8y6c3z3l3c8({ selector, updateValue }={}) { 
         const element = document.querySelector(selector); 
         if(updateValue && element){ 
@@ -306,7 +294,6 @@ n_ready(function(){
             element.style.height = parseInt(h.height) + updateValue + 'px'; 
         } 
     } 
-
     function updateElement3s4y0s1v1e8q2e0w4x3({ selector, updateValue, type, isClone = false, elem } = {}) { 
         let element = document.querySelector(selector); 
         if (!element) { 
@@ -364,7 +351,6 @@ n_ready(function(){
             } 
         } 
     } 
-
     function cloneAndUpdateElement5a6r5u4j4s1k8s9h9a6({ selector, updateValue, type, editable = false, isClone = true, notCloneable = false } = {}){ 
         if (notCloneable) { 
             return false; 
@@ -402,7 +388,6 @@ n_ready(function(){
             } 
         }); 
     } 
-
     function getRandomSelectId5k4f0o8v4f5o2g0w4j0() { 
         const maxDigits = 13; 
         let randomNumber = Math.random().toString().slice(2); 
@@ -412,7 +397,6 @@ n_ready(function(){
         randomNumber = randomNumber.substring(0, maxDigits); 
         return parseInt(randomNumber, 10); 
     } 
-
     function emulateChange4z5a8f8x0j9k3d5h1m1(target) { 
         document.querySelectorAll(".t-store__prod-snippet__container .t-product__option-title").forEach(function(item) { 
             if (item.innerHTML == target.closest(".t-input-group").querySelector("label").innerHTML) { 
@@ -425,7 +409,6 @@ n_ready(function(){
             } 
         }); 
     } 
-
     function calculateNewTopValue9k5n6f8k1m7r3t4c4o5({ settings1v6h6i5s2n9b6k0s6n7, type, element }={}){ 
         let zm = 1; 
         if (element.hasAttribute("data-scale-off") && element.getAttribute("data-scale-off") == "yes") { 
@@ -438,7 +421,6 @@ n_ready(function(){
         } 
         return `${Math.round(parseInt(getComputedStyle(element).top) + settings1v6h6i5s2n9b6k0s6n7[type].padding * zm + settings1v6h6i5s2n9b6k0s6n7[type].totalHeight * zm)}px`; 
     } 
-
     function changeTop2f6o3h9i2f2p2o3t7e4({ value, selector, type, element }={}){ 
         element.style.top = value; 
         element.setAttribute('data-field-top-value', value.replace("px","")); 
@@ -449,7 +431,6 @@ n_ready(function(){
             element.classList.add(type+'_cloned'); 
         } 
     } 
-
     function activateButton4e6c6l4f7y0l5n9s1q7() { 
         let buttonsList = document.querySelectorAll(zeroId + ' .' + addToCartBtnClass); 
         let leftover = document.querySelector('.t-store__prod-snippet__container .js-store-product')?.getAttribute('data-product-inv'); 
@@ -498,7 +479,6 @@ n_ready(function(){
             }); 
         } 
     } 
-
     function activateWishButton6z4s7y2e0x9n1x2r0h8() { 
         let addButtonList = document.querySelectorAll(zeroId + ' .' + addToWishBtnClass); 
         let removeButtonList = document.querySelectorAll(zeroId + ' .' + removeFromWishBtnClass); 
@@ -581,7 +561,6 @@ n_ready(function(){
             clearInterval(intForFavoriteButton); 
         },1000); 
     } 
-
     function activateQuantity8v9w8b6n9d5e7m7v9o2() { 
         let productQuantityInput = document.querySelector('.t-store__prod__quantity-input'); 
         if (productQuantityInput) { 
@@ -613,7 +592,6 @@ n_ready(function(){
             }); 
         } 
     } 
-
     function setGallery2k7z8w6u5m7q9s1e9x6() { 
         let imgList = []; 
         let imgListLength; 
@@ -679,7 +657,6 @@ n_ready(function(){
         },7000) 
     } 
     setGallery2k7z8w6u5m7q9s1e9x6(); 
-
     function getProp1c4k5r9r8t7b2s6j9w8({ type, update = false }={}) { 
         if (type == "gallery") { 
             return false; 
@@ -866,7 +843,6 @@ n_ready(function(){
                     if (type == "characteristics" || type == "options") { 
                         h_raznica = settings1v6h6i5s2n9b6k0s6n7[type].totalHeight; 
                         if(type == "characteristics") { 
-                            console.log('h_raznica',h_raznica); 
                         } 
                         settings1v6h6i5s2n9b6k0s6n7[type].elemsHeight.forEach(item => { 
                             increaseHeight5a5r3l8o8y6c3z3l3c8({ selector: item.selector, updateValue: h_raznica }); 
@@ -877,8 +853,6 @@ n_ready(function(){
                         if (fonShape && textElem) { 
                             let fonShapeStyle = window.getComputedStyle(fonShape); 
                             let textElemStyle = window.getComputedStyle(textElem); 
-                            console.log('fonShapeStyle',fonShapeStyle); 
-                            console.log('textElemStyle',textElemStyle); 
                             let topDiff = parseInt(textElemStyle.top) - parseInt(fonShapeStyle.top); 
                             fonShape.style.height = parseInt(textElemStyle.height) + (topDiff*2)+ "px"; 
                         } 
@@ -890,9 +864,7 @@ n_ready(function(){
             clearInterval(int); 
         },1000); 
     } 
-
     // ========== ИНТЕГРАЦИЯ ЦВЕТОВЫХ ОПЦИЙ ==========
-    
     // Функция инициализации размеров
     function initSizeOptions() {
         // Ищем элементы размеров по аналогии с цветами
@@ -905,18 +877,14 @@ n_ready(function(){
             '[href*="size"]',
             '[href*="размер"]'
         ];
-        
         let sizeElements = [];
-        
         // Сначала ищем по конкретным ссылкам (как для цветов)
         sizeHrefSelectors.forEach(selector => {
             const elements = document.querySelectorAll(selector);
             if (elements.length > 0) {
-                console.log(`Found size elements with href selector "${selector}":`, elements.length);
                 sizeElements = sizeElements.concat(Array.from(elements));
             }
         });
-        
         // Если не нашли по ссылкам, попробуем другие селекторы
         if (sizeElements.length === 0) {
             const sizeSelectors = [
@@ -925,16 +893,13 @@ n_ready(function(){
                 '.t-store__prod-snippet__container .t-product__option .t-input-group[data-field-name*="размер"]',
                 '.t-store__prod-snippet__container .t-product__option .t-input-group[data-field-name*="size"]'
             ];
-            
             sizeSelectors.forEach(selector => {
                 const elements = document.querySelectorAll(selector);
                 if (elements.length > 0) {
-                    console.log(`Found size elements with selector "${selector}":`, elements.length);
                     sizeElements = sizeElements.concat(Array.from(elements));
                 }
             });
         }
-        
         // Если не нашли через селекторы, попробуем найти по тексту
         if (sizeElements.length === 0) {
             const allOptions = document.querySelectorAll('.t-store__prod-snippet__container .t-product__option');
@@ -944,17 +909,12 @@ n_ready(function(){
                     title.textContent.toLowerCase().includes('размер') || 
                     title.textContent.toLowerCase().includes('size')
                 )) {
-                    console.log('Found size option by title:', title.textContent);
                     const buttons = option.querySelectorAll('button, .t-input-group button, [role="button"]');
                     sizeElements = sizeElements.concat(Array.from(buttons));
                 }
             });
         }
-        
-        console.log('Total size elements found:', sizeElements.length);
-        
         // Дополнительная диагностика - выводим все href на странице для поиска размеров
-        console.log('=== DIAGNOSTIC: All href attributes on page ===');
         const allLinks = document.querySelectorAll('a[href]');
         allLinks.forEach((link, index) => {
             if (link.href && (
@@ -962,149 +922,95 @@ n_ready(function(){
                 link.href.includes('размер') ||
                 link.href.includes('#') && link.textContent.match(/^\d+$/)
             )) {
-                console.log(`Link ${index}: href="${link.href}" text="${link.textContent.trim()}"`);
             }
         });
-        console.log('=== END DIAGNOSTIC ===');
-        
         if (sizeElements.length > 0) {
             // Добавляем класс для размеров
             sizeElements.forEach((element, index) => {
                 element.classList.add('hoversize');
                 element.setAttribute('data-size-index', index);
-                
                 // Пытаемся определить размер из текста элемента
                 const sizeText = element.textContent.trim() || element.innerText.trim();
                 if (sizeText && /^\d+$/.test(sizeText)) {
                     element.setAttribute('data-size-value', sizeText);
-                    console.log(`Size element ${index}: ${sizeText}`);
                 }
             });
-            
             // Устанавливаем активный размер (первый)
             if (sizeElements[0]) {
                 sizeElements[0].classList.add('activesize');
             }
-            
             // Привязываем обработчики клика для размеров
             $('.hoversize').click(function(e) {
                 e.preventDefault();
-                
                 const sizeIndex = $(this).attr('data-size-index');
                 const sizeValue = $(this).attr('data-size-value');
-                
-                console.log('=== SIZE CLICK HANDLER ===');
-                console.log('Clicked size index:', sizeIndex);
-                console.log('Clicked size value:', sizeValue);
-                console.log('Clicked element:', this);
-                console.log('Element text content:', this.textContent.trim());
-                
                 // Деактивируем все размеры
                 $('.hoversize').removeClass('activesize');
                 $(this).addClass('activesize');
-                
                 // Синхронизируем с Tilda Store
                 if (sizeValue) {
-                    console.log('Calling syncSizeWithStore with:', sizeValue);
                     syncSizeWithStore(sizeValue);
                 } else {
                     console.error('No size value found for element:', this);
                 }
-                
                 return false;
             });
-            
-            console.log('Size event handlers attached to', $('.hoversize').length, 'elements');
         }
-        
         // Если размеры не найдены автоматически, можно добавить их вручную
         // Раскомментируйте и измените селектор, если знаете правильный href для размеров
         /*
-        console.log('=== MANUAL SIZE INITIALIZATION ===');
         $('[href="#SIZE_HREF_HERE"]').addClass('hoversize');
         $('.hoversize:eq(0)').addClass('activesize');
-        console.log('Manual size elements added:', $('.hoversize').length);
         */
     }
-    
     // Функция синхронизации размера с Tilda Store
     function syncSizeWithStore(sizeValue) {
-        console.log('=== SYNC SIZE WITH STORE ===');
-        console.log('Trying to sync size:', sizeValue);
-        
         // Ищем селект с опцией размера
         const allSelects = document.querySelectorAll('.t-store__prod-snippet__container .t-product__option select');
-        console.log('All selects found:', allSelects.length);
-        
         let sizeSelect = null;
-        
         allSelects.forEach((select, index) => {
             const optionTitle = select.closest('.t-product__option').querySelector('.t-product__option-title');
-            console.log(`Select ${index}:`, optionTitle ? optionTitle.textContent : 'No title');
-            
             if (optionTitle && (
                 optionTitle.textContent.toLowerCase().includes('размер') || 
                 optionTitle.textContent.toLowerCase().includes('size')
             )) {
                 sizeSelect = select;
-                console.log('Found size select:', optionTitle.textContent);
             }
         });
-        
         if (sizeSelect) {
-            console.log('Size select current value:', sizeSelect.value);
-            console.log('Size select options:', Array.from(sizeSelect.options).map(opt => `${opt.value} (${opt.text})`));
-            
             // Проверяем, есть ли нужное значение в опциях
             const hasValue = Array.from(sizeSelect.options).some(option => 
                 option.value === sizeValue || option.text === sizeValue
             );
-            
-            console.log('Has value in options:', hasValue);
-            
             if (hasValue) {
                 // Устанавливаем выбранный размер в селекте
                 sizeSelect.value = sizeValue;
-                console.log('Set size value to:', sizeValue);
-                console.log('Size select value after setting:', sizeSelect.value);
-                
                 // Инициируем событие изменения
                 const changeEvent = new Event('change', { bubbles: true });
                 sizeSelect.dispatchEvent(changeEvent);
-                
                 // Дополнительно пытаемся найти и кликнуть по соответствующей опции
                 const optionElement = Array.from(sizeSelect.options).find(option => 
                     option.value === sizeValue || option.text === sizeValue
                 );
-                
                 if (optionElement) {
                     optionElement.selected = true;
-                    console.log('Selected option:', optionElement.text);
                 }
-                
                 // Обновляем опции и цену
                 setTimeout(function() { 
-                    console.log('Updating options and price for size...');
                     getProp1c4k5r9r8t7b2s6j9w8({ type: 'options', update: true }); 
                     getProp1c4k5r9r8t7b2s6j9w8({ type: 'price' }); 
                 }, 500);
-                
                 // Дополнительная попытка обновления через Tilda API
                 setTimeout(function() {
                     forceCatalogUpdate();
                 }, 1000);
-                
             } else {
                 console.warn('Size value not found in options:', sizeValue);
-                console.log('Available options:', Array.from(sizeSelect.options).map(opt => opt.value));
             }
         } else {
             console.warn('No size select found');
         }
-        
-        console.log('=== END SYNC SIZE ===');
     }
-    
     // Функция инициализации цветовых опций
     function initColorOptions() {
         // Присваиваем классы элементам цветовых опций
@@ -1113,30 +1019,23 @@ n_ready(function(){
         $('[href = "#colortext"]').addClass('colortext');
         $('[href = "#prodimg"]').addClass('prodimg');
         $('[href = "#kankenclassicbutton"]').addClass('classicbutton');
-        
         // Задаём нужную ссылку для кнопки
         $('.classicbutton').attr('href', '#order:Kanken Classic (Pink) = 3900:::image=https://static.tildacdn.com/tild3961-6237-4864-a232-386535633032/bag1.jpg');
-        
         // Устанавливаем начальный цвет (3-й элемент - это Розовый)
         $('.colortext').text('Розовый').css('color', '#E5AAAC');
         $('.colorname').text('Розовый');
-        
         // Функция деактивации всех цветов
         function activecolor() { 
             $('.hovercolor').removeClass('activecolor');
         }
-
         let number = 0;
-        
         // При клике на цвет
         $(".hovercolor").click(function(e) {
             e.preventDefault();
-            
             // Вычисляем номер нашего цвета        
             number = $(".hovercolor").index(this);
             activecolor();   
             $(this).addClass('activecolor');
-            
             // Обновляем текст цвета в зависимости от выбранного цвета
             // ПОРЯДОК ОБРАТНЫЙ! Розовый находится в конце списка
             if (number == 0) {
@@ -1163,21 +1062,14 @@ n_ready(function(){
                 // Синхронизируем с опцией товара в Tilda Store
                 syncColorWithStore('Розовый');
             }
-            
             return false;
         });
     }
-    
     // Функция синхронизации выбора цвета с опциями товара в Tilda Store
     function syncColorWithStore(colorValue) {
-        console.log('Trying to sync color:', colorValue);
-        
         // Ищем все селекты с опциями товара
         const allSelects = document.querySelectorAll('.t-store__prod-snippet__container .t-product__option select');
-        console.log('Found selects:', allSelects.length);
-        
         let colorSelect = null;
-        
         // Ищем селект с опцией цвета
         allSelects.forEach(select => {
             const optionTitle = select.closest('.t-product__option').querySelector('.t-product__option-title');
@@ -1187,66 +1079,48 @@ n_ready(function(){
                 optionTitle.textContent.toLowerCase().includes('окрас')
             )) {
                 colorSelect = select;
-                console.log('Found color select:', optionTitle.textContent);
             }
         });
-        
         // Если не нашли по названию, берем первый селект
         if (!colorSelect && allSelects.length > 0) {
             colorSelect = allSelects[0];
-            console.log('Using first select as color select');
         }
-        
         if (colorSelect) {
-            console.log('Color select options:', Array.from(colorSelect.options).map(opt => opt.value));
-            
             // Проверяем, есть ли нужное значение в опциях
             const hasValue = Array.from(colorSelect.options).some(option => 
                 option.value.toLowerCase() === colorValue.toLowerCase() ||
                 option.text.toLowerCase() === colorValue.toLowerCase()
             );
-            
             if (hasValue) {
                 // Устанавливаем выбранный цвет в селекте
                 colorSelect.value = colorValue;
-                console.log('Set color value to:', colorValue);
-                
                 // Инициируем событие изменения
                 const changeEvent = new Event('change', { bubbles: true });
                 colorSelect.dispatchEvent(changeEvent);
-                
                 // Также пытаемся найти и кликнуть по соответствующей опции
                 const optionElement = Array.from(colorSelect.options).find(option => 
                     option.value.toLowerCase() === colorValue.toLowerCase() ||
                     option.text.toLowerCase() === colorValue.toLowerCase()
                 );
-                
                 if (optionElement) {
                     optionElement.selected = true;
-                    console.log('Selected option:', optionElement.text);
                 }
-                
                 // Обновляем опции и цену через основную функцию NLM150
                 setTimeout(function() { 
-                    console.log('Updating options and price...');
                     getProp1c4k5r9r8t7b2s6j9w8({ type: 'options', update: true }); 
                     getProp1c4k5r9r8t7b2s6j9w8({ type: 'price' }); 
                 }, 500);
-                
                 // Дополнительная попытка обновления через Tilda API
                 setTimeout(function() {
                     forceCatalogUpdate();
                 }, 1000);
-                
             } else {
                 console.warn('Color value not found in options:', colorValue);
-                console.log('Available options:', Array.from(colorSelect.options).map(opt => opt.value));
             }
         } else {
             console.warn('No color select found');
         }
     }
-    
     // Дополнительная функция для принудительного обновления каталога
     function forceCatalogUpdate() {
         // Пытаемся найти и обновить каталог через различные методы
@@ -1258,7 +1132,6 @@ n_ready(function(){
                 window.t_store.updatePrice();
             }
         }
-        
         // Ищем и кликаем по кнопкам обновления, если они есть
         const updateButtons = document.querySelectorAll('[data-action="update"], .t-store__update-btn');
         updateButtons.forEach(btn => {
@@ -1266,7 +1139,6 @@ n_ready(function(){
                 btn.click();
             }
         });
-        
         // Принудительно обновляем через события
         const productContainer = document.querySelector('.js-store-product');
         if (productContainer) {
@@ -1276,39 +1148,26 @@ n_ready(function(){
             productContainer.dispatchEvent(updateEvent);
         }
     }
-    
     // Инициализируем цветовые опции после загрузки DOM
     $(document).ready(function() {
         initColorOptions();
         initSizeOptions();
-        
         // Добавляем дополнительную проверку через 2 секунды
         setTimeout(function() {
-            console.log('Checking Tilda Store integration...');
-            
             // Проверяем наличие каталога
             const storeContainer = document.querySelector('.t-store__prod-snippet__container');
             if (storeContainer) {
-                console.log('Tilda Store container found');
-                
                 // Проверяем опции товара
                 const options = storeContainer.querySelectorAll('.t-product__option');
-                console.log('Found product options:', options.length);
-                
                 options.forEach((option, index) => {
                     const title = option.querySelector('.t-product__option-title');
                     const select = option.querySelector('select');
                     if (title && select) {
-                        console.log(`Option ${index + 1}:`, title.textContent, 'Values:', Array.from(select.options).map(opt => opt.value));
-                        
                         // Если это опция цвета, выводим подробную информацию
                         if (title.textContent.toLowerCase().includes('цвет') || 
                             title.textContent.toLowerCase().includes('color')) {
-                            console.log('=== COLOR OPTIONS DETAILS ===');
                             Array.from(select.options).forEach((opt, optIndex) => {
-                                console.log(`Color ${optIndex}: "${opt.value}" (text: "${opt.text}")`);
                             });
-                            console.log('=============================');
                         }
                     }
                 });
@@ -1317,13 +1176,10 @@ n_ready(function(){
             }
         }, 2000);
     });
-
     setTimeout(function(){ 
         let renderInt = setInterval(function() { 
             if (window.isAllElemsRendered1450750621) { 
                 clearInterval(renderInt); 
-                // Временно отключаем adjustGroups для тестирования
-                // adjustGroups7x6n5k7g9a9f9i8s8t9(settings1v6h6i5s2n9b6k0s6n7, "start"); 
                 for (let key in settings1v6h6i5s2n9b6k0s6n7) { 
                     getProp1c4k5r9r8t7b2s6j9w8({ type: key }); 
                 } 
@@ -1335,7 +1191,6 @@ n_ready(function(){
         setTimeout(() => { 
             clearInterval(renderInt); 
         },1000); 
-        
         const intForCountSlides = setInterval(() => { 
             const itemsWrapper = document.querySelector(".js-store-product .t-slds__items-wrapper"); 
             if (!itemsWrapper) { 
@@ -1379,7 +1234,6 @@ n_ready(function(){
             clearInterval(intForCountSlides); 
         },1000) 
     },1000); 
-
     function updateAfterResize4r8m0c7v8v1i6j8p2a8() { 
         for (let key in settings1v6h6i5s2n9b6k0s6n7) { 
             document.querySelectorAll(zeroId + " ." + key + "_cloned").forEach(function(item) { 
@@ -1392,13 +1246,10 @@ n_ready(function(){
                 fonShape.style.height = fonShape.getAttribute("data-field-height-value") + "px"; 
             } 
         } 
-        // Временно отключаем adjustGroups для тестирования
-        // adjustGroups7x6n5k7g9a9f9i8s8t9(settings1v6h6i5s2n9b6k0s6n7, "start");
         for (let key in settings1v6h6i5s2n9b6k0s6n7) { 
             getProp1c4k5r9r8t7b2s6j9w8({ type: key }); 
         } 
     } 
-
     function debounce0b7p1b9q6t5o6b2j2z3(fn, delay) { 
         let timeoutID = null; 
         return function() { 
@@ -1412,7 +1263,6 @@ n_ready(function(){
             }, delay); 
         } 
     } 
-
     let firstResize = true; 
     const resizeChange1a9i5z0u9u9f1p6u1f8 = debounce0b7p1b9q6t5o6b2j2z3(function() { 
         if(firstResize) { 
@@ -1427,8 +1277,6 @@ n_ready(function(){
                 setTimeout(function() { 
                     getProp1c4k5r9r8t7b2s6j9w8({ type: 'options', update: true }); 
                     getProp1c4k5r9r8t7b2s6j9w8({ type: 'price' }); 
-                    // Временно отключаем adjustGroups для тестирования
-                    // adjustGroups7x6n5k7g9a9f9i8s8t9(settings1v6h6i5s2n9b6k0s6n7, "second"); 
                     if(1 !== 1) { 
                         setTimeout(function() { 
                             loaderHide(); 
@@ -1438,11 +1286,9 @@ n_ready(function(){
             },500); 
         } 
     }, 1500); 
-
     window.addEventListener("resize", function() { 
         resizeChange1a9i5z0u9u9f1p6u1f8(); 
     }); 
-
     function adjustGroups7x6n5k7g9a9f9i8s8t9(settings1v6h6i5s2n9b6k0s6n7, type) { 
         const calculateTotalHeight = (elements) => elements.reduce((sum, el) => sum + el.offsetHeight, 0); 
         function getGroupRect8j4i9m9u7g7q4w6t1j7(elements) { 
@@ -1688,151 +1534,130 @@ n_ready(function(){
             increaseBlockHeight2d9h8d4r0c6z8u5e8f3(lastGroup.marginBottomMobile); 
     } 
 }); 
-</script> 
-
-<style> 
+</script>
+<style>
 .nolimAutoScaleFix { 
-    opacity: 0!important; 
-    height: 0!important; 
-    max-height: 0!important; 
-    min-height: 0!important; 
-    pointer-events: none!important; 
-    overflow: hidden!important; 
-    padding-top: 0!important; 
-    padding-bottom: 0!important; 
-    position: absolute; 
-    bottom: -100000px; 
+height: 0!important; 
+max-height: 0!important; 
+min-height: 0!important; 
+pointer-events: none!important; 
+overflow: hidden!important; 
+padding-top: 0!important; 
+padding-bottom: 0!important; 
+position: absolute; 
+bottom: -100000px; 
 } 
-
 .t-nolim-select { 
-    min-width: 100%; 
-    box-sizing: border-box; 
-    cursor: pointer; 
-    height: 60px; 
-    padding: 0 45px 0 20px; 
-    font-size: 16px; 
-    line-height: 1.33; 
-    outline: none; 
-    border: 0; 
-    border-radius: 0; 
-    background: transparent; 
-    color: initial; 
-    -webkit-appearance: none; 
-    appearance: none; 
-    -moz-appearance: none; 
+min-width: 100%; 
+box-sizing: border-box; 
+cursor: pointer; 
+height: 60px; 
+padding: 0 45px 0 20px; 
+font-size: 16px; 
+line-height: 1.33; 
+outline: none; 
+border: 0; 
+border-radius: 0; 
+background: transparent; 
+color: initial; 
+-webkit-appearance: none; 
+appearance: none; 
+-moz-appearance: none; 
 } 
-
 .tn-elem__1450750621176088907676191580 .tn-atom { 
-    white-space: nowrap; 
+white-space: nowrap; 
 } 
-
 .t-store__prod-snippet__container .t-store__prod-popup__close-txt-wr, 
 .t-store__prod-snippet__container .t-popup__close, 
 .t-store__prod-snippet__container .js-store-product{ 
-    display: none!important; 
+display: none!important; 
 } 
-
 .t-store__prod-snippet__container { 
-    padding-top: 0px!important; 
-    padding-bottom: 0px!important; 
+padding-top: 0px!important; 
+padding-bottom: 0px!important; 
 } 
-
 .tn-elem__14507506211760888749616, 
 .tn-elem__14507506211760888887430, 
 .removeFavoriteClassNlm150 { 
-    cursor: pointer; 
+cursor: pointer; 
 } 
-
 .loader__overlay { 
-    width: 100%; 
-    height: 100%; 
-    position: fixed; 
-    top: 0; 
-    right: 0; 
-    bottom: 0; 
-    left: 0; 
-    z-index: 999999; 
-    background-color: #fff; 
+width: 100%; 
+height: 100%; 
+position: fixed; 
+top: 0; 
+right: 0; 
+bottom: 0; 
+left: 0; 
+z-index: 999999; 
+background-color: #fff; 
 } 
-
 .loader__container { 
-    width: 100%; 
-    height: 100%; 
-    position: absolute; 
-    top: 0; 
-    right: 0; 
-    bottom: 0; 
-    left: 0; 
-    z-index: 9999999; 
-    transition: 0.6s; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
+width: 100%; 
+height: 100%; 
+position: absolute; 
+top: 0; 
+right: 0; 
+bottom: 0; 
+left: 0; 
+z-index: 9999999; 
+transition: 0.6s; 
+display: flex; 
+align-items: center; 
+justify-content: center; 
 } 
-
 .loader { 
-    width: 75px; 
-    height: 75px; 
-    border: 10px solid #ffffff; 
-    border-radius: 50%; 
-    border-left-color: #ffffff; 
-    animation: loader 1.3s linear infinite; 
+width: 75px; 
+height: 75px; 
+border: 10px solid #ffffff; 
+border-radius: 50%; 
+border-left-color: #ffffff; 
+animation: loader 1.3s linear infinite; 
 } 
-
 @keyframes loader { 
-    100% { 
-        transform: rotate(360deg); 
-    } 
+100% { 
+transform: rotate(360deg); 
+} 
 }
-
 /* Стили для цветовых опций */
 .hovercolor {
-    cursor: pointer;
-    border-radius: 50%;
-    display: inline-block;
+cursor: pointer;
+border-radius: 50%;
+display: inline-block;
 }
-
 .activecolor {
-    box-shadow: 0px 0px 0px 3px #ffffff, 0px 0px 0px 4px #000000 !important;
+box-shadow: 0px 0px 0px 3px #ffffff, 0px 0px 0px 4px #000000 !important;
 }
-
 .colortext {
-    font-weight: bold;
-    margin-left: 10px;
+font-weight: bold;
+margin-left: 10px;
 }
-
 /* Стили для размеров */
 .hoversize {
-    cursor: pointer;
-    border-radius: 50%;
-    display: inline-block;
+cursor: pointer;
+border-radius: 50%;
+display: inline-block;
 }
-
 .activesize {
-    box-shadow: 0px 0px 0px 1px #000000 !important;
+box-shadow: 0px 0px 0px 1px #000000 !important;
 }
-
 /* Стили для описания товара */
 .tn-elem__1450750621176088924800187760 {
-    font-family: 'Raleway', sans-serif !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
+font-family: 'Raleway', sans-serif !important;
+font-size: 14px !important;
+font-weight: 500 !important;
 }
-
 /* Стили для названия цвета */
 .colorname {
-    font-family: 'Raleway', sans-serif !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
+font-family: 'Raleway', sans-serif !important;
+font-size: 14px !important;
+font-weight: 500 !important;
 }
-
 /* Стили для заголовка товара */
 .tn-elem__1450750621176096459787649250 {
-    text-align: center !important;
+text-align: center !important;
 }
-
 .tn-elem__1450750621176096459787649250 .tn-atom {
-    text-align: center !important;
+text-align: center !important;
 }
-
 </style>
