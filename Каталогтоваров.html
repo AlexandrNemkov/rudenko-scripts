@@ -2,22 +2,181 @@
     (function(){
         const zeroblock = document.querySelector('#rec1279145061');
         const catalog = document.querySelector('#rec1252581816');
-        if (!!catalog) {
-            zeroblock.querySelector('.t396__artboard').addEventListener('artBoardRendered', (e) => {
-                e.target.querySelector('.necodim-showmore').addEventListener('click', (event) => {
-                    event.preventDefault();
-                    zeroblock.querySelector('.necodim-showmore .tn-atom').classList.add('loading');
-                    catalog.querySelector('.t-store__load-more-btn').click();
-                });
+        
+        // Система кликов по цветовым фильтрам
+        function initColorFilterSystem() {
+            document.addEventListener('click', function(e) {
+                // Проверяем клик по ссылкам с якорями colorfilter1, colorfilter2, etc.
+                const colorFilterLink = e.target.closest('a[href^="#colorfilter"]');
+                if (colorFilterLink) {
+                    e.preventDefault();
+                    
+                    // Извлекаем номер из href (например, #colorfilter1 -> 1)
+                    const href = colorFilterLink.getAttribute('href');
+                    const match = href.match(/#colorfilter(\d+)/);
+                    if (match) {
+                        const filterIndex = parseInt(match[1]) - 1; // Преобразуем в 0-based индекс
+                        clickColorFilter(filterIndex);
+                    }
+                }
             });
+        }
+        
+        // Функция получения всех цветов из каталога
+        function getCatalogColors() {
+            if (!catalog) {
+                console.log('Каталог не найден');
+                return [];
+            }
+            
+            const colors = [];
+            
+            // Пробуем разные селекторы для поиска цветовых фильтров
+            const selectors = [
+                '.t-store_filter_checkbox_color',
+                '.t-store_filter_checkbox',
+                '.t-store_filter_item_color .t-checkbox_control',
+                '.t-store_filter_item_color label',
+                '.t-store_filter_item_color input[type="checkbox"]',
+                '[data-filter-label="цвет"] .t-checkbox_control',
+                '[data-filter-label="цвет"] label',
+                '[data-filter-label="цвет"] input[type="checkbox"]',
+                '.t-store_filter_item-controls-container_color .t-checkbox_control',
+                '.t-store_filter_item-controls-container_color label',
+                '.t-store_filter_item-controls-container_color input[type="checkbox"]'
+            ];
+            
+            let colorFilters = [];
+            let usedSelector = '';
+            
+            // Пробуем каждый селектор
+            for (const selector of selectors) {
+                colorFilters = catalog.querySelectorAll(selector);
+                if (colorFilters.length > 0) {
+                    usedSelector = selector;
+                    console.log(`Найдены фильтры с селектором: ${selector}, количество: ${colorFilters.length}`);
+                    break;
+                }
+            }
+            
+            if (colorFilters.length === 0) {
+                console.log('Не найдены цветовые фильтры ни с одним селектором');
+                console.log('Пробуем поиск по всему документу...');
+                
+                // Поиск по всему документу
+                const allElements = document.querySelectorAll('*');
+                const foundElements = [];
+                allElements.forEach(el => {
+                    const text = el.textContent?.trim();
+                    if (text && /^(Графитовый|Розовый|Кирпичный|Теплый желтый|Красный|Бежевый|Черный|Серый|Синий|Белый|Желтый)$/i.test(text)) {
+                        if (el.tagName === 'LABEL' || el.tagName === 'INPUT' || el.classList.contains('t-checkbox')) {
+                            foundElements.push(el);
+                        }
+                    }
+                });
+                colorFilters = foundElements;
+                console.log('Найдено элементов с названиями цветов:', colorFilters.length);
+            }
+            
+            colorFilters.forEach((filter, index) => {
+                // Получаем название цвета из различных атрибутов
+                const colorName = filter.getAttribute('data-tooltip') || 
+                                filter.getAttribute('aria-label') || 
+                                filter.getAttribute('data-filter-value') ||
+                                filter.getAttribute('name') ||
+                                filter.textContent?.trim();
+                
+                if (colorName && colorName !== '') {
+                    colors.push({
+                        index: index,
+                        name: colorName,
+                        element: filter
+                    });
+                }
+            });
+            
+            console.log('Найденные цвета в каталоге:', colors);
+            console.log('Использованный селектор:', usedSelector);
+            return colors;
+        }
+        
+        // Функция клика по цветовому фильтру по индексу
+        function clickColorFilter(filterIndex) {
+            const colors = getCatalogColors();
+            
+            if (filterIndex >= 0 && filterIndex < colors.length) {
+                const targetColor = colors[filterIndex];
+                console.log('Кликаем по фильтру:', targetColor.name, 'с индексом:', filterIndex);
+                
+                // Кликаем по найденному фильтру
+                targetColor.element.click();
+            } else {
+                console.log('Индекс фильтра вне диапазона:', filterIndex, 'Доступно фильтров:', colors.length);
+                console.log('Доступные цвета:', colors.map(c => c.name));
+            }
+        }
+        
+        // Инициализация системы цветовых фильтров
+        initColorFilterSystem();
+        
+        if (!!catalog) {
+            const artboard = zeroblock?.querySelector('.t396__artboard');
+            if (artboard) {
+                artboard.addEventListener('artBoardRendered', (e) => {
+                    const showmore = e.target.querySelector('.necodim-showmore');
+                    if (showmore) {
+                        showmore.addEventListener('click', (event) => {
+                            event.preventDefault();
+                            const showmoreAtom = zeroblock?.querySelector('.necodim-showmore .tn-atom');
+                            if (showmoreAtom) {
+                                showmoreAtom.classList.add('loading');
+                            }
+                            const loadMoreBtn = catalog.querySelector('.t-store__load-more-btn');
+                            if (loadMoreBtn) {
+                                loadMoreBtn.click();
+                            }
+                        });
+                    }
+                });
+            }
+            
             catalog.querySelector('.js-store-grid-cont').addEventListener('tStoreRendered', () => {
-                zeroblock.style.display = '';
-                zeroblock.querySelector('.necodim-showmore .tn-atom').classList.remove('loading');
-                if (catalog.querySelector('.t-store__load-more-btn').style.display === 'none') zeroblock.style.display = 'none';
-                if (!!catalog.querySelector('.js-store-empty-part-msg')) zeroblock.style.display = 'none';
+                if (zeroblock) {
+                    zeroblock.style.display = '';
+                    const showmoreAtom = zeroblock.querySelector('.necodim-showmore .tn-atom');
+                    if (showmoreAtom) {
+                        showmoreAtom.classList.remove('loading');
+                    }
+                    
+                    const loadMoreBtn = catalog.querySelector('.t-store__load-more-btn');
+                    if (loadMoreBtn && loadMoreBtn.style.display === 'none') {
+                        zeroblock.style.display = 'none';
+                    }
+                    
+                    if (!!catalog.querySelector('.js-store-empty-part-msg')) {
+                        zeroblock.style.display = 'none';
+                    }
+                }
+                
+                // Показываем доступные цвета после загрузки каталога
+                console.log('Каталог загружен, ищем цвета...');
+                console.log('HTML каталога:', catalog.outerHTML.substring(0, 500) + '...');
+                
+                const colors = getCatalogColors();
+                console.log('=== ДОСТУПНЫЕ ЦВЕТА В КАТАЛОГЕ ===');
+                if (colors.length > 0) {
+                    colors.forEach((color, index) => {
+                        console.log(`#colorfilter${index + 1} → ${color.name}`);
+                    });
+                } else {
+                    console.log('Цвета не найдены!');
+                }
+                console.log('================================');
             });
         } else {
-            zeroblock.style.display = 'none';
+            if (zeroblock) {
+                zeroblock.style.display = 'none';
+            }
         }
     }());
     </script> <style> .t-store__load-more-btn-wrap {
