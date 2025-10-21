@@ -683,7 +683,7 @@ n_ready(function(){
     function getProp1c4k5r9r8t7b2s6j9w8({ type, update = false }={}) { 
         if (type == "gallery") { 
             return false; 
-        } 
+        }
         let int = setInterval(function(){ 
             let chars = document.querySelectorAll(settings1v6h6i5s2n9b6k0s6n7[type].productSelector); 
             if(type === 'brand' && chars.length === 0) { 
@@ -1322,7 +1322,8 @@ n_ready(function(){
         let renderInt = setInterval(function() { 
             if (window.isAllElemsRendered1450750621) { 
                 clearInterval(renderInt); 
-                adjustGroups7x6n5k7g9a9f9i8s8t9(settings1v6h6i5s2n9b6k0s6n7, "start"); 
+                // Временно отключаем adjustGroups для тестирования
+                // adjustGroups7x6n5k7g9a9f9i8s8t9(settings1v6h6i5s2n9b6k0s6n7, "start"); 
                 for (let key in settings1v6h6i5s2n9b6k0s6n7) { 
                     getProp1c4k5r9r8t7b2s6j9w8({ type: key }); 
                 } 
@@ -1391,7 +1392,8 @@ n_ready(function(){
                 fonShape.style.height = fonShape.getAttribute("data-field-height-value") + "px"; 
             } 
         } 
-        adjustGroups7x6n5k7g9a9f9i8s8t9(settings1v6h6i5s2n9b6k0s6n7, "start"); 
+        // Временно отключаем adjustGroups для тестирования
+        // adjustGroups7x6n5k7g9a9f9i8s8t9(settings1v6h6i5s2n9b6k0s6n7, "start");
         for (let key in settings1v6h6i5s2n9b6k0s6n7) { 
             getProp1c4k5r9r8t7b2s6j9w8({ type: key }); 
         } 
@@ -1425,7 +1427,8 @@ n_ready(function(){
                 setTimeout(function() { 
                     getProp1c4k5r9r8t7b2s6j9w8({ type: 'options', update: true }); 
                     getProp1c4k5r9r8t7b2s6j9w8({ type: 'price' }); 
-                    adjustGroups7x6n5k7g9a9f9i8s8t9(settings1v6h6i5s2n9b6k0s6n7, "second"); 
+                    // Временно отключаем adjustGroups для тестирования
+                    // adjustGroups7x6n5k7g9a9f9i8s8t9(settings1v6h6i5s2n9b6k0s6n7, "second"); 
                     if(1 !== 1) { 
                         setTimeout(function() { 
                             loaderHide(); 
