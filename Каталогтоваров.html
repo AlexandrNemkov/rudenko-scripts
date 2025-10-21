@@ -22,6 +22,25 @@
             });
         }
         
+        // Система кликов по размерам
+        function initSizeFilterSystem() {
+            document.addEventListener('click', function(e) {
+                // Проверяем клик по ссылкам с якорем #filtersize
+                const sizeFilterLink = e.target.closest('a[href="#filtersize"]');
+                if (sizeFilterLink) {
+                    e.preventDefault();
+                    
+                    // Получаем размер из data-size атрибута или текста ссылки
+                    const sizeValue = sizeFilterLink.getAttribute('data-size') || 
+                                   sizeFilterLink.textContent?.trim();
+                    
+                    if (sizeValue) {
+                        clickSizeFilter(sizeValue);
+                    }
+                }
+            });
+        }
+        
         // Функция получения всех цветов из каталога
         function getCatalogColors() {
             if (!catalog) {
@@ -106,6 +125,110 @@
             return colors;
         }
         
+        // Функция получения всех размеров из каталога
+        function getCatalogSizes() {
+            if (!catalog) {
+                console.log('Каталог не найден');
+                return [];
+            }
+            
+            const sizes = [];
+            
+            // Пробуем разные селекторы для поиска размеров
+            const selectors = [
+                '.t-store_filter_custom-sel',
+                '.js-store-filter-custom-select',
+                '.t-store_filter_custom-sel_buttons',
+                '.t-store_filter_custom-sel_simple',
+                '[data-filter-value]',
+                '[data-select-val]',
+                '.t-store_filter_checkbox_size',
+                '.t-store_filter_item_size .t-checkbox_control',
+                '.t-store_filter_item_size label',
+                '.t-store_filter_item_size input[type="checkbox"]',
+                '[data-filter-label="размер"] .t-checkbox_control',
+                '[data-filter-label="размер"] label',
+                '[data-filter-label="размер"] input[type="checkbox"]',
+                '.t-store_filter_item-controls-container_size .t-checkbox_control',
+                '.t-store_filter_item-controls-container_size label',
+                '.t-store_filter_item-controls-container_size input[type="checkbox"]'
+            ];
+            
+            let sizeFilters = [];
+            let usedSelector = '';
+            
+            // Пробуем каждый селектор
+            for (const selector of selectors) {
+                sizeFilters = catalog.querySelectorAll(selector);
+                if (sizeFilters.length > 0) {
+                    usedSelector = selector;
+                    console.log(`Найдены размеры с селектором: ${selector}, количество: ${sizeFilters.length}`);
+                    break;
+                }
+            }
+            
+            if (sizeFilters.length === 0) {
+                console.log('Не найдены размеры ни с одним селектором');
+                console.log('Пробуем поиск по всему документу...');
+                
+                // Поиск по всему документу
+                const allElements = document.querySelectorAll('*');
+                const foundElements = [];
+                allElements.forEach(el => {
+                    const text = el.textContent?.trim();
+                    if (text && /^(40|42|44|46|48|50|52|54|56|58|60)$/i.test(text)) {
+                        if (el.tagName === 'LABEL' || el.tagName === 'INPUT' || el.classList.contains('t-checkbox')) {
+                            foundElements.push(el);
+                        }
+                    }
+                });
+                sizeFilters = foundElements;
+                console.log('Найдено элементов с размерами:', sizeFilters.length);
+            }
+            
+            const foundSizeNames = new Set(); // Для отслеживания уже найденных размеров
+            
+            sizeFilters.forEach((filter, index) => {
+                // Получаем размер из различных атрибутов
+                const sizeName = filter.getAttribute('data-select-val') ||
+                               filter.getAttribute('data-filter-value') ||
+                               filter.getAttribute('data-tooltip') || 
+                               filter.getAttribute('aria-label') || 
+                               filter.getAttribute('name') ||
+                               filter.textContent?.trim();
+                
+                if (sizeName && sizeName !== '' && !foundSizeNames.has(sizeName)) {
+                    foundSizeNames.add(sizeName);
+                    sizes.push({
+                        index: sizes.length,
+                        name: sizeName,
+                        element: filter
+                    });
+                }
+            });
+            
+            console.log('Найденные размеры в каталоге (без дублей):', sizes);
+            console.log('Использованный селектор для размеров:', usedSelector);
+            console.log('Всего найдено элементов размеров:', sizeFilters.length);
+            console.log('Уникальных размеров:', sizes.length);
+            console.log('Отфильтровано дублей размеров:', sizeFilters.length - sizes.length);
+            return sizes;
+        }
+        
+        // Функция клика по размеру
+        function clickSizeFilter(sizeValue) {
+            const sizes = getCatalogSizes();
+            
+            const targetSize = sizes.find(size => size.name === sizeValue);
+            if (targetSize) {
+                console.log('Кликаем по размеру:', targetSize.name);
+                targetSize.element.click();
+            } else {
+                console.log('Размер не найден:', sizeValue);
+                console.log('Доступные размеры:', sizes.map(s => s.name));
+            }
+        }
+        
         // Функция клика по цветовому фильтру по индексу
         function clickColorFilter(filterIndex) {
             const colors = getCatalogColors();
@@ -122,8 +245,9 @@
             }
         }
         
-        // Инициализация системы цветовых фильтров
+        // Инициализация систем фильтров
         initColorFilterSystem();
+        initSizeFilterSystem();
         
         if (!!catalog) {
             const artboard = zeroblock?.querySelector('.t396__artboard');
@@ -164,8 +288,8 @@
                     }
                 }
                 
-                // Показываем доступные цвета после загрузки каталога
-                console.log('Каталог загружен, ищем цвета...');
+                // Показываем доступные цвета и размеры после загрузки каталога
+                console.log('Каталог загружен, ищем цвета и размеры...');
                 console.log('HTML каталога:', catalog.outerHTML.substring(0, 500) + '...');
                 
                 const colors = getCatalogColors();
@@ -178,6 +302,17 @@
                     console.log('Цвета не найдены!');
                 }
                 console.log('================================');
+                
+                const sizes = getCatalogSizes();
+                console.log('=== ДОСТУПНЫЕ РАЗМЕРЫ В КАТАЛОГЕ ===');
+                if (sizes.length > 0) {
+                    sizes.forEach((size, index) => {
+                        console.log(`#filtersize (data-size="${size.name}") → ${size.name}`);
+                    });
+                } else {
+                    console.log('Размеры не найдены!');
+                }
+                console.log('==================================');
             });
         } else {
             if (zeroblock) {
