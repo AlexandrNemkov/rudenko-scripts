@@ -931,7 +931,7 @@ n_ready(function(){
                 element.setAttribute('data-size-index', index);
                 // Пытаемся определить размер из текста элемента
                 const sizeText = element.textContent.trim() || element.innerText.trim();
-                if (sizeText && /^\d+$/.test(sizeText)) {
+                if (sizeText && (/^\d+$/.test(sizeText) || sizeText.toLowerCase().includes('меркам') || sizeText.toLowerCase().includes('мерка'))) {
                     element.setAttribute('data-size-value', sizeText);
                 }
             });
@@ -980,7 +980,10 @@ n_ready(function(){
         if (sizeSelect) {
             // Проверяем, есть ли нужное значение в опциях
             const hasValue = Array.from(sizeSelect.options).some(option => 
-                option.value === sizeValue || option.text === sizeValue
+                option.value === sizeValue || 
+                option.text === sizeValue ||
+                option.value.toLowerCase().includes(sizeValue.toLowerCase()) ||
+                option.text.toLowerCase().includes(sizeValue.toLowerCase())
             );
             if (hasValue) {
                 // Устанавливаем выбранный размер в селекте
@@ -990,7 +993,10 @@ n_ready(function(){
                 sizeSelect.dispatchEvent(changeEvent);
                 // Дополнительно пытаемся найти и кликнуть по соответствующей опции
                 const optionElement = Array.from(sizeSelect.options).find(option => 
-                    option.value === sizeValue || option.text === sizeValue
+                    option.value === sizeValue || 
+                    option.text === sizeValue ||
+                    option.value.toLowerCase().includes(sizeValue.toLowerCase()) ||
+                    option.text.toLowerCase().includes(sizeValue.toLowerCase())
                 );
                 if (optionElement) {
                     optionElement.selected = true;
@@ -1640,6 +1646,9 @@ display: inline-block;
 }
 .activesize {
 box-shadow: 0px 0px 0px 1px #000000 !important;
+}
+.merki.activesize {
+border-radius: 4px !important;
 }
 /* Стили для описания товара */
 .tn-elem__1450750621176088924800187760 {
