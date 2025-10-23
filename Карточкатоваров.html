@@ -1021,13 +1021,13 @@ n_ready(function(){
     function initColorOptions() {
         // Присваиваем классы элементам цветовых опций
         $('[href = "#coloricon"]').addClass('hovercolor');
-        $('.hovercolor:eq(3)').addClass('activecolor');
+        $('.hovercolor:eq(0)').addClass('activecolor');
         $('[href = "#colortext"]').addClass('colortext');
         $('[href = "#prodimg"]').addClass('prodimg');
         $('[href = "#kankenclassicbutton"]').addClass('classicbutton');
         // Задаём нужную ссылку для кнопки
         $('.classicbutton').attr('href', '#order:Kanken Classic (Pink) = 3900:::image=https://static.tildacdn.com/tild3961-6237-4864-a232-386535633032/bag1.jpg');
-        // Устанавливаем начальный цвет (3-й элемент - это Розовый)
+        // Устанавливаем начальный цвет (0-й элемент - это Розовый)
         $('.colortext').text('Розовый').css('color', '#E5AAAC');
         $('.colorname').text('Розовый');
         // Функция деактивации всех цветов
@@ -1043,30 +1043,30 @@ n_ready(function(){
             activecolor();   
             $(this).addClass('activecolor');
             // Обновляем текст цвета в зависимости от выбранного цвета
-            // ПОРЯДОК ОБРАТНЫЙ! Розовый находится в конце списка
+            // ИСПРАВЛЕННЫЙ ПОРЯДОК: 0-Розовый, 1-Графитовый, 2-Теплый желтый, 3-Кирпичный
             if (number == 0) {
-                $('.colortext').text('Кирпичный').css('color', '#9F583A');
-                $('.colorname').text('Кирпичный');
+                $('.colortext').text('Розовый').css('color', '#E5AAAC');
+                $('.colorname').text('Розовый');
                 // Синхронизируем с опцией товара в Tilda Store
-                syncColorWithStore('Кирпичный');
+                syncColorWithStore('Розовый');
             }
             if (number == 1) {
-                $('.colortext').text('Теплый желтый').css('color', '#E7C01A');
-                $('.colorname').text('Теплый желтый');
-                // Синхронизируем с опцией товара в Tilda Store
-                syncColorWithStore('Теплый желтый');
-            }
-            if (number == 2) {
                 $('.colortext').text('Графитовый').css('color', '#555D68');
                 $('.colorname').text('Графитовый');
                 // Синхронизируем с опцией товара в Tilda Store
                 syncColorWithStore('Графитовый');
             }
-            if (number == 3) {
-                $('.colortext').text('Розовый').css('color', '#E5AAAC');
-                $('.colorname').text('Розовый');
+            if (number == 2) {
+                $('.colortext').text('Теплый желтый').css('color', '#E7C01A');
+                $('.colorname').text('Теплый желтый');
                 // Синхронизируем с опцией товара в Tilda Store
-                syncColorWithStore('Розовый');
+                syncColorWithStore('Теплый желтый');
+            }
+            if (number == 3) {
+                $('.colortext').text('Кирпичный').css('color', '#9F583A');
+                $('.colorname').text('Кирпичный');
+                // Синхронизируем с опцией товара в Tilda Store
+                syncColorWithStore('Кирпичный');
             }
             return false;
         });
