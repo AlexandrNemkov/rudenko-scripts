@@ -435,6 +435,51 @@ n_ready(function(){
         let buttonsList = document.querySelectorAll(zeroId + ' .' + addToCartBtnClass); 
         let leftover = document.querySelector('.t-store__prod-snippet__container .js-store-product')?.getAttribute('data-product-inv'); 
         const defaultOrderButton = document.querySelector('.t-store__prod-snippet__container a[href="#order"]'); 
+        
+            // Функция для получения цены
+        function getPrice() {
+            const priceElem = document.querySelector('.js-store-prod-price-val.t-store__prod-popup__price-value');
+            return priceElem ? priceElem.innerText : '';
+        }
+        
+        // Глобальная функция для обновления текста кнопки в мобильной версии
+        window.updateButtonTextForMobile = function() {
+            if (window.innerWidth <= 640) {
+                const buttons = document.querySelectorAll(zeroId + ' .' + addToCartBtnClass + ' .tn-atom');
+                buttons.forEach(function(btn) {
+                    const price = getPrice();
+                    if (price) {
+                        btn.innerText = 'Купить за ' + price;
+                    }
+                });
+            }
+        };
+        
+        // Функция для изменения текста кнопки в мобильной версии
+        function updateButtonText() {
+            if (window.innerWidth <= 640) {
+                buttonsList.forEach(function(btn) {
+                    const btnAtom = btn.querySelector('.tn-atom');
+                    if (btnAtom) {
+                        const price = getPrice();
+                        if (price) {
+                            btnAtom.innerText = 'Купить за ' + price;
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Вызываем обновление текста при загрузке
+        updateButtonText();
+        
+        // Обновляем текст при изменении размера окна
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(updateButtonText, 100);
+        });
+        
         if (buttonsList.length > 0) { 
             buttonsList.forEach(function(item) { 
                 const itemTnAtom = item.querySelector('.tn-atom'); 
@@ -1524,7 +1569,11 @@ n_ready(function(){
                     if(slideInZeroForClick) { 
                         slideInZeroForClick.click(); 
                     } 
-                } 
+                }
+                // Обновляем текст кнопки при изменении варианта товара
+                if (window.updateButtonTextForMobile) {
+                    window.updateButtonTextForMobile();
+                }
             } 
             jsStoreProduct.removeEventListener('tStoreVariantChange', tStoreVariantChangeHandler); 
             jsStoreProduct.addEventListener('tStoreVariantChange', tStoreVariantChangeHandler); 
