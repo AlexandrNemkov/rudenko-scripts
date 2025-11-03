@@ -1199,31 +1199,311 @@ n_ready(function(){
             productContainer.dispatchEvent(updateEvent);
         }
     }
+    // ========== ДИНАМИЧЕСКАЯ ИНИЦИАЛИЗАЦИЯ ЦВЕТОВ И РАЗМЕРОВ ==========
+    function initDynamicOptions() {
+        // Ждем, пока загрузится каталог
+        const int = setInterval(() => {
+            const storeContainer = document.querySelector('.t-store__prod-snippet__container');
+            if (storeContainer) {
+                clearInterval(int);
+                // Инициализируем размеры и цвета
+                initDynamicSizes();
+                initDynamicColors();
+            }
+        }, 100);
+        
+        setTimeout(() => clearInterval(int), 5000);
+    }
+    
+    // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ ЦВЕТА И ЗАКРАСКИ ИКОНКИ =====
+    function extractHexFromString(str) {
+        if (!str) return null;
+        const m = String(str).match(/#([0-9a-f]{3,8})/i);
+        return m ? `#${m[1]}` : null;
+    }
+
+    // Фолбэк-словарь, если в каталоге нет явного hex
+    const COLOR_NAME_TO_HEX = {
+        'розовый': '#E5AAAC',
+        'графитовый': '#555D68',
+        'тёплый жёлтый': '#E7C01A',
+        'теплый желтый': '#E7C01A',
+        'кирпичный': '#9F583A'
+    };
+
+    function resolveHexForOption(optionEl, name) {
+        // 1) ищем hex в тексте
+        let hex = extractHexFromString(optionEl.text);
+        if (hex) return hex;
+
+        // 2) ищем hex в value
+        hex = extractHexFromString(optionEl.value);
+        if (hex) return hex;
+
+        // 3) ищем hex в data-атрибутах
+        hex = optionEl.getAttribute && (optionEl.getAttribute('data-color') || optionEl.getAttribute('data-hex') || optionEl.getAttribute('data-tc-color'));
+        hex = extractHexFromString(hex);
+        if (hex) return hex;
+
+        // 4) иногда цвет задают стилем background-color
+        const styleAttr = optionEl.getAttribute && optionEl.getAttribute('style');
+        hex = extractHexFromString(styleAttr);
+        if (hex) return hex;
+
+        // 5) фолбэк по имени
+        const key = String(name || '').trim().toLowerCase();
+        return COLOR_NAME_TO_HEX[key] || null;
+    }
+
+    function paintColorIcon(element, hex) {
+        if (!element || !hex) return;
+        // стараемся закрасить svg-шейп, если он есть
+        const svg = element.querySelector && element.querySelector('svg');
+        if (svg) {
+            const shape = svg.querySelector('[fill]') || svg.querySelector('path, rect, circle, ellipse, polygon');
+            if (shape) {
+                shape.setAttribute('fill', hex);
+                return;
+            }
+        }
+        // если svg не найден — покрасим фон кружка/элемента
+        element.style.backgroundColor = hex;
+    }
+    
+    // Функция для динамической инициализации цветов из каталога
+    function initDynamicColors() {
+        const storeContainer = document.querySelector('.t-store__prod-snippet__container');
+        if (!storeContainer) return;
+        
+        // Ищем селект цвета в каталоге
+        const colorSelect = Array.from(document.querySelectorAll('.t-product__option select')).find(select => {
+            const optionTitle = select.closest('.t-product__option').querySelector('.t-product__option-title');
+            return optionTitle && (
+                optionTitle.textContent.toLowerCase().includes('цвет') || 
+                optionTitle.textContent.toLowerCase().includes('color')
+            );
+        });
+        
+        if (!colorSelect) return;
+        
+        // Получаем цвета из каталога (включаем все опции, кроме первой если она пустая)
+        const allOptions = Array.from(colorSelect.options).filter(opt => opt && opt.text && opt.text.trim());
+        const options = allOptions.length > 1 && allOptions[0].text.trim() === '' ? allOptions.slice(1) : allOptions;
+
+        // Преобразуем в структуру { name, hex }
+        const colorItems = options.map(opt => {
+            const name = opt.text.trim();
+            const hex = resolveHexForOption(opt, name);
+            return { name, hex };
+        }).filter(it => it.name);
+        
+        // Находим шаблонный элемент цвета
+        const firstColorElement = document.querySelector('[href="#coloricon"]');
+        if (!firstColorElement) return;
+        
+        const parent = firstColorElement.parentNode;
+        
+        // Удаляем все ранее созданные клоны цветов (но не трогаем шаблонный элемент и размеры)
+        const existingClones = Array.from(parent.children).filter(el => 
+            el.classList.contains('hovercolor') && 
+            el !== firstColorElement && 
+            !el.classList.contains('hoversize')
+        );
+        existingClones.forEach(el => el.remove());
+        
+        // Клонируем элементы для каждого цвета
+        let lastColorElement = firstColorElement;
+        colorItems.forEach((item, index) => {
+            let element;
+            
+            if (index === 0) {
+                element = firstColorElement;
+            } else {
+                element = firstColorElement.cloneNode(true);
+                // Вставляем после последнего вставленного цвета
+                parent.insertBefore(element, lastColorElement.nextSibling);
+            }
+            
+            element.classList.add('hovercolor');
+            element.setAttribute('data-color-name', item.name);
+            if (item.hex) element.setAttribute('data-color-hex', item.hex);
+            
+            if (index === 0) {
+                element.classList.add('activecolor');
+            }
+            
+            // красим иконку сразу
+            paintColorIcon(element, item.hex);
+            
+            lastColorElement = element;
+        });
+        
+        // Устанавливаем начальный цвет и синхронизируем с Tilda Store
+        if (colorItems.length > 0) {
+            $('.colortext').text(colorItems[0].name);
+            $('.colorname').text(colorItems[0].name);
+            
+            // Вызываем синхронизацию первого цвета
+            setTimeout(function() {
+                syncColorWithStore(colorItems[0].name);
+            }, 500);
+        }
+        
+        // Привязываем обработчик клика на цвет
+        $('.hovercolor').off('click').on('click', function(e) {
+            e.preventDefault();
+            $('.hovercolor').removeClass('activecolor');
+            $(this).addClass('activecolor');
+            
+            const colorName = $(this).attr('data-color-name');
+            const colorHex = $(this).attr('data-color-hex');
+            $('.colortext').text(colorName);
+            $('.colorname').text(colorName);
+            paintColorIcon(this, colorHex);
+            syncColorWithStore(colorName);
+            
+            return false;
+        });
+    }
+    
+    // Функция для динамической инициализации размеров из каталога
+    function initDynamicSizes() {
+        const storeContainer = document.querySelector('.t-store__prod-snippet__container');
+        if (!storeContainer) return;
+        
+        // Ищем селект размера в каталоге
+        const sizeSelect = Array.from(document.querySelectorAll('.t-product__option select')).find(select => {
+            const optionTitle = select.closest('.t-product__option').querySelector('.t-product__option-title');
+            return optionTitle && (
+                optionTitle.textContent.toLowerCase().includes('размер') || 
+                optionTitle.textContent.toLowerCase().includes('size')
+            );
+        });
+        
+        if (!sizeSelect) return;
+        
+        // Получаем размеры из каталога (включаем все опции, кроме первой если она пустая)
+        const allSizes = Array.from(sizeSelect.options).map(opt => opt.text.trim()).filter(opt => opt);
+        let sizes = allSizes.length > 1 && allSizes[0] === '' ? allSizes.slice(1) : allSizes;
+        
+        // Разделяем на числовые размеры и "По меркам"
+        const numericSizes = [];
+        const byMeasureSize = [];
+        
+        sizes.forEach(size => {
+            const lowerSize = size.toLowerCase();
+            if (lowerSize.includes('меркам') || lowerSize.includes('мерка') || lowerSize.includes('по меркам')) {
+                byMeasureSize.push(size);
+            } else if (size.match(/\d+/)) {
+                numericSizes.push(size);
+            }
+        });
+        
+        // Сортируем числовые размеры
+        numericSizes.sort((a, b) => parseInt(a) - parseInt(b));
+        
+        // Формируем финальный массив: числовые размеры + "По меркам"
+        const finalSizes = [...new Set(numericSizes), ...byMeasureSize];
+        
+        // Находим шаблонный элемент размера
+        const firstSizeElement = document.querySelector('[href="#sizeicon"]');
+        if (!firstSizeElement) return;
+        
+        const parent = firstSizeElement.parentNode;
+        
+        // Удаляем все ранее созданные клоны размеров (но не трогаем шаблонный элемент и цвета)
+        const existingClonesSize = Array.from(parent.children).filter(el => 
+            el.classList.contains('hoversize') && 
+            el !== firstSizeElement && 
+            !el.classList.contains('hovercolor')
+        );
+        existingClonesSize.forEach(el => el.remove());
+        
+        // Клонируем элементы для каждого размера
+        let lastSizeElement = firstSizeElement;
+        finalSizes.forEach((size, index) => {
+            let element;
+            
+            if (index === 0) {
+                element = firstSizeElement;
+            } else {
+                element = firstSizeElement.cloneNode(true);
+                // Вставляем после последнего вставленного размера
+                parent.insertBefore(element, lastSizeElement.nextSibling);
+                lastSizeElement = element;
+            }
+            
+            element.classList.add('hoversize');
+            element.setAttribute('data-size-value', size);
+            
+            // Обновляем текст размера
+            const textElement = element.querySelector('.tn-atom');
+            if (textElement) {
+                // Для "По меркам" пишем полностью, для числовых - только число
+                if (size.toLowerCase().includes('меркам') || size.toLowerCase().includes('по меркам')) {
+                    textElement.textContent = size;
+                } else {
+                    // Пишем просто число
+                    textElement.textContent = size;
+                }
+            }
+            
+            if (index === 0) {
+                element.classList.add('activesize');
+            }
+        });
+        
+        // Сохраняем последний размер
+        window._lastSizeElement = lastSizeElement;
+        
+        // Создаем принудительный перенос строки после размеров
+        const breakEl = document.createElement('br');
+        breakEl.className = 'size-color-break';
+        breakEl.style.cssText = 'width: 100%; display: block; height: 0;';
+        parent.insertBefore(breakEl, lastSizeElement.nextSibling);
+        
+        // Синхронизируем первый размер с Tilda Store
+        if (finalSizes.length > 0) {
+            setTimeout(function() {
+                syncSizeWithStore(finalSizes[0]);
+            }, 500);
+        }
+        
+        // Привязываем обработчик клика на размер
+        $('.hoversize').off('click').on('click', function(e) {
+            e.preventDefault();
+            $('.hoversize').removeClass('activesize');
+            $(this).addClass('activesize');
+            
+            const sizeValue = $(this).attr('data-size-value');
+            syncSizeWithStore(sizeValue);
+            
+            return false;
+        });
+    }
+    
+        // Инициализируем динамические опции
+    initDynamicOptions();
+    
     // Инициализируем цветовые опции после загрузки DOM
     $(document).ready(function() {
         initColorOptions();
         initSizeOptions();
-        // Добавляем дополнительную проверку через 2 секунды
+        
+        // Автоматически выбираем первый цвет и размер при загрузке
         setTimeout(function() {
-            // Проверяем наличие каталога
-            const storeContainer = document.querySelector('.t-store__prod-snippet__container');
-            if (storeContainer) {
-                // Проверяем опции товара
-                const options = storeContainer.querySelectorAll('.t-product__option');
-                options.forEach((option, index) => {
-                    const title = option.querySelector('.t-product__option-title');
-                    const select = option.querySelector('select');
-                    if (title && select) {
-                        // Если это опция цвета, выводим подробную информацию
-                        if (title.textContent.toLowerCase().includes('цвет') || 
-                            title.textContent.toLowerCase().includes('color')) {
-                            Array.from(select.options).forEach((opt, optIndex) => {
-                            });
-                        }
-                    }
-                });
-            } else {
-                console.warn('Tilda Store container not found');
+            const firstColor = document.querySelector('.hovercolor[data-color-name]');
+            if (firstColor && !firstColor.classList.contains('activecolor')) {
+                firstColor.classList.add('activecolor');
+                const colorName = firstColor.getAttribute('data-color-name');
+                syncColorWithStore(colorName);
+            }
+            
+            const firstSize = document.querySelector('.hoversize[data-size-value]');
+            if (firstSize && !firstSize.classList.contains('activesize')) {
+                firstSize.classList.add('activesize');
+                const sizeValue = firstSize.getAttribute('data-size-value');
+                syncSizeWithStore(sizeValue);
             }
         }, 2000);
     });
@@ -1689,7 +1969,12 @@ transform: rotate(360deg);
 .hovercolor {
 cursor: pointer;
 border-radius: 50%;
-display: inline-block;
+display: inline-block !important;
+margin-right: 8px !important;
+position: relative !important;
+width: 24px !important;
+height: 24px !important;
+box-sizing: border-box !important;
 }
 .activecolor {
 box-shadow: 0px 0px 0px 3px #ffffff, 0px 0px 0px 4px #000000 !important;
@@ -1702,13 +1987,52 @@ margin-left: 10px;
 .hoversize {
 cursor: pointer;
 border-radius: 50%;
-display: inline-block;
+display: inline-flex !important;
+align-items: center !important;
+justify-content: center !important;
+margin-right: 8px !important;
+position: relative !important;
+width: 30px !important;
+height: 30px !important;
+box-sizing: border-box !important;
 }
 .activesize {
 box-shadow: 0px 0px 0px 1px #000000 !important;
 }
-.merki.activesize {
-border-radius: 4px !important;
+/* Специальный стиль для "ПО МЕРКАМ" */
+.hoversize[data-size-value*="меркам"],
+.hoversize[data-size-value*="мерка"] {
+width: 78px !important;
+height: 30px !important;
+border-radius: 2px !important;
+margin-top: -3px !important;
+}
+.hoversize[data-size-value*="меркам"].activesize,
+.hoversize[data-size-value*="мерка"].activesize {
+border: 1px solid #000000 !important;
+border-radius: 2px !important;
+box-shadow: none !important;
+}
+/* Стили для внутреннего содержимого размеров */
+.hoversize .tn-atom {
+font-size: 12px !important;
+line-height: 1 !important;
+}
+.hoversize[data-size-value*="меркам"] .tn-atom,
+.hoversize[data-size-value*="мерка"] .tn-atom {
+font-size: 11px !important;
+line-height: 1.2 !important;
+white-space: nowrap !important;
+text-transform: uppercase !important;
+text-align: center !important;
+display: flex !important;
+align-items: center !important;
+justify-content: center !important;
+}
+/* Стили для внутреннего содержимого цветов */
+.hovercolor .tn-atom {
+font-size: 0 !important;
+overflow: hidden !important;
 }
 /* Стили для описания товара */
 .tn-elem__1450750621176088924800187760 {
