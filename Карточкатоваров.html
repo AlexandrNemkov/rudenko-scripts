@@ -1303,6 +1303,11 @@ n_ready(function(){
         
         const parent = firstColorElement.parentNode;
         
+        // Снимаем активные классы со всех существующих цветовых элементов, включая шаблон
+        document.querySelectorAll('.hovercolor').forEach(function(el){
+            el.classList.remove('activecolor');
+        });
+        
         // Удаляем все ранее созданные клоны цветов (но не трогаем шаблонный элемент и размеры)
         const existingClones = Array.from(parent.children).filter(el => 
             el.classList.contains('hovercolor') && 
@@ -1325,6 +1330,8 @@ n_ready(function(){
             }
             
             element.classList.add('hovercolor');
+            // Удаляем возможное состояние активности, скопированное при клонировании
+            element.classList.remove('activecolor');
             element.setAttribute('data-color-name', item.name);
             if (item.hex) element.setAttribute('data-color-hex', item.hex);
             
@@ -1411,6 +1418,11 @@ n_ready(function(){
         
         const parent = firstSizeElement.parentNode;
         
+        // Снимаем активные классы со всех существующих элементов размера, включая шаблон
+        document.querySelectorAll('.hoversize').forEach(function(el){
+            el.classList.remove('activesize');
+        });
+        
         // Удаляем все ранее созданные клоны размеров (но не трогаем шаблонный элемент и цвета)
         const existingClonesSize = Array.from(parent.children).filter(el => 
             el.classList.contains('hoversize') && 
@@ -1434,6 +1446,8 @@ n_ready(function(){
             }
             
             element.classList.add('hoversize');
+            // Удаляем возможное состояние активности, скопированное при клонировании
+            element.classList.remove('activesize');
             element.setAttribute('data-size-value', size);
             
             // Обновляем текст размера
