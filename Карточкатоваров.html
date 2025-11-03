@@ -1367,6 +1367,12 @@ n_ready(function(){
             $('.colortext').text(colorName);
             $('.colorname').text(colorName);
             paintColorIcon(this, colorHex);
+            // Пользователь выбрал цвет вручную — помечаем и отменяем авто-инициализацию
+            window._colorClicked = true;
+            if (window._initFirstSizeTimeout) {
+                clearTimeout(window._initFirstSizeTimeout);
+                window._initFirstSizeTimeout = null;
+            }
             syncColorWithStore(colorName);
             
             return false;
@@ -1490,6 +1496,13 @@ n_ready(function(){
             $(this).addClass('activesize');
             
             const sizeValue = $(this).attr('data-size-value');
+            // Помечаем, что пользователь взаимодействовал с размерами,
+            // и гасим отложенную авто-инициализацию первого размера
+            window._sizeClicked = true;
+            if (window._initFirstSizeTimeout) {
+                clearTimeout(window._initFirstSizeTimeout);
+                window._initFirstSizeTimeout = null;
+            }
             syncSizeWithStore(sizeValue);
             
             return false;
@@ -1505,20 +1518,25 @@ n_ready(function(){
         initSizeOptions();
         
         // Автоматически выбираем первый цвет и размер при загрузке
-        setTimeout(function() {
+        // Откладываем авто-выбор первого цвета/размера, но не вмешиваемся,
+        // если пользователь уже что-то выбрал или актив уже расставлен
+        window._initFirstSizeTimeout = setTimeout(function() {
             const firstColor = document.querySelector('.hovercolor[data-color-name]');
-            if (firstColor && !firstColor.classList.contains('activecolor')) {
+            const hasActiveColor = !!document.querySelector('.hovercolor.activecolor');
+            if (!window._colorClicked && firstColor && !hasActiveColor && !firstColor.classList.contains('activecolor')) {
                 firstColor.classList.add('activecolor');
                 const colorName = firstColor.getAttribute('data-color-name');
                 syncColorWithStore(colorName);
             }
             
             const firstSize = document.querySelector('.hoversize[data-size-value]');
-            if (firstSize && !firstSize.classList.contains('activesize')) {
+            const hasActiveSize = !!document.querySelector('.hoversize.activesize');
+            if (!window._sizeClicked && firstSize && !hasActiveSize && !firstSize.classList.contains('activesize')) {
                 firstSize.classList.add('activesize');
                 const sizeValue = firstSize.getAttribute('data-size-value');
                 syncSizeWithStore(sizeValue);
             }
+            window._initFirstSizeTimeout = null;
         }, 2000);
     });
     setTimeout(function(){ 
