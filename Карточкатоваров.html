@@ -1316,7 +1316,42 @@ n_ready(function(){
         );
         existingClones.forEach(el => el.remove());
         
+        // Хелпер: выставить позиции клонов справа от первого, учитывая 12px зазор
+        function positionColorClones() {
+            const first = firstColorElement;
+            if (!first) return;
+            const parentRect = parent.getBoundingClientRect();
+            const firstRect = first.getBoundingClientRect();
+            const baseTop = Math.round(firstRect.top - parentRect.top + parent.scrollTop);
+            const baseLeft = Math.round(firstRect.left - parentRect.left + parent.scrollLeft);
+            const innerRef = first.querySelector('.tn-atom') || first;
+            let diameter = Math.round(innerRef.getBoundingClientRect().width) || 24;
+            if (!diameter || diameter <= 0) {
+                diameter = parseInt(window.getComputedStyle(innerRef).width || '24', 10) || 24;
+            }
+            const gap = 12;
+            const items = Array.from(parent.querySelectorAll('.hovercolor'));
+            items.forEach((el, idx) => {
+                if (idx === 0) return;
+                stripTildaPositionAttrs(el);
+                // Ставим инлайновые стили с приоритетом !important, чтобы не перетиралось
+                el.style.setProperty('position', 'absolute', 'important');
+                el.style.setProperty('top', baseTop + 'px', 'important');
+                el.style.setProperty('left', (baseLeft + idx * (diameter + gap)) + 'px', 'important');
+                el.dataset.colorClone = '1';
+            });
+        }
+
         // Клонируем элементы для каждого цвета
+        function stripTildaPositionAttrs(elem) {
+            // Удаляем атрибуты позиционирования, чтобы Tilda не перезаписывала наши инлайновые стили
+            const attrs = Array.from(elem.attributes).map(a => a.name);
+            attrs.forEach(name => {
+                if (/^data-field-(left|top|container|axisx|axisy|width|widthunits|height|heightunits|topunits|leftunits|pos|zindex|align|valign)-value$/.test(name)) {
+                    elem.removeAttribute(name);
+                }
+            });
+        }
         let lastColorElement = firstColorElement;
         colorItems.forEach((item, index) => {
             let element;
@@ -1341,9 +1376,39 @@ n_ready(function(){
             
             // красим иконку сразу
             paintColorIcon(element, item.hex);
+
+            // Для элементов, начиная со второго, выставим позицию позже общей функцией
             
             lastColorElement = element;
         });
+
+        // Первая расстановка позиций
+        positionColorClones();
+        // Повторяем после полной загрузки (когда Tilda дорисовала/пересчитала стили)
+        window.addEventListener('load', function(){
+            positionColorClones();
+            // Несколько раз в ближайшие 1.5с на случай поздних перерасчётов
+            let n = 6; // каждые ~250мс
+            const id = setInterval(function(){
+                positionColorClones();
+                if (--n <= 0) clearInterval(id);
+            }, 250);
+        });
+        // При ресайзе — тоже пересчитать
+        window.addEventListener('resize', positionColorClones);
+
+        // Наблюдаем за изменениями стилей Tilda и восстанавливаем наши координаты
+        const mo = new MutationObserver(function(mutations){
+            let need = false;
+            for (const m of mutations) {
+                if (m.type === 'attributes' && m.attributeName === 'style' && m.target.classList && m.target.classList.contains('hovercolor')) {
+                    // Если Tilda изменила стиль у наших клонов — пересчитаем
+                    need = true; break;
+                }
+            }
+            if (need) positionColorClones();
+        });
+        mo.observe(parent, { subtree: true, attributes: true, attributeFilter: ['style'] });
         
         // Устанавливаем начальный цвет и синхронизируем с Tilda Store
         if (colorItems.length > 0) {
@@ -1476,11 +1541,7 @@ n_ready(function(){
         // Сохраняем последний размер
         window._lastSizeElement = lastSizeElement;
         
-        // Создаем принудительный перенос строки после размеров
-        const breakEl = document.createElement('br');
-        breakEl.className = 'size-color-break';
-        breakEl.style.cssText = 'width: 100%; display: block; height: 0;';
-        parent.insertBefore(breakEl, lastSizeElement.nextSibling);
+        // Перенос строки для размеров больше не добавляется, сохраняем исходную разметку Tilda
         
         // Синхронизируем первый размер с Tilda Store
         if (finalSizes.length > 0) {
@@ -1999,14 +2060,10 @@ transform: rotate(360deg);
 }
 /* Стили для цветовых опций */
 .hovercolor {
-cursor: pointer;
-border-radius: 50%;
-display: inline-block !important;
-margin-right: 8px !important;
-position: relative !important;
-width: 24px !important;
-height: 24px !important;
-box-sizing: border-box !important;
+    cursor: pointer;
+    border-radius: 50%;
+    /* Не трогаем размещение, сохраняем абсолютное позиционирование Tilda */
+    /* display, position, top/left и размеры — как в исходных стилях Tilda */
 }
 .activecolor {
 box-shadow: 0px 0px 0px 3px #ffffff, 0px 0px 0px 4px #000000 !important;
