@@ -1201,18 +1201,8 @@ n_ready(function(){
     }
     // ========== ДИНАМИЧЕСКАЯ ИНИЦИАЛИЗАЦИЯ ЦВЕТОВ И РАЗМЕРОВ ==========
     function initDynamicOptions() {
-        // Ждем, пока загрузится каталог
-        const int = setInterval(() => {
-            const storeContainer = document.querySelector('.t-store__prod-snippet__container');
-            if (storeContainer) {
-                clearInterval(int);
-                // Инициализируем размеры и цвета
-                initDynamicSizes();
-                initDynamicColors();
-            }
-        }, 100);
-        
-        setTimeout(() => clearInterval(int), 5000);
+        initDynamicSizes();
+        initDynamicColors();
     }
     
     // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ ЦВЕТА И ЗАКРАСКИ ИКОНКИ =====
@@ -1272,9 +1262,6 @@ n_ready(function(){
     
     // Функция для динамической инициализации цветов из каталога
     function initDynamicColors() {
-        const storeContainer = document.querySelector('.t-store__prod-snippet__container');
-        if (!storeContainer) return;
-        
         // Ищем селект цвета в каталоге
         const colorSelect = Array.from(document.querySelectorAll('.t-product__option select')).find(select => {
             const optionTitle = select.closest('.t-product__option').querySelector('.t-product__option-title');
@@ -1322,9 +1309,8 @@ n_ready(function(){
             if (!first) return;
             const parentRect = parent.getBoundingClientRect();
             const firstRect = first.getBoundingClientRect();
-            // Используем координаты окна, чтобы избежать NaN при отсутствии scrollTop/Left у родителя
-            const baseTop = Math.round(firstRect.top - parentRect.top + (parent.scrollTop || 0) + window.scrollY);
-            const baseLeft = Math.round(firstRect.left - parentRect.left + (parent.scrollLeft || 0) + window.scrollX);
+            const baseTop = Math.round(firstRect.top - parentRect.top + parent.scrollTop);
+            const baseLeft = Math.round(firstRect.left - parentRect.left + parent.scrollLeft);
             const innerRef = first.querySelector('.tn-atom') || first;
             let diameter = Math.round(innerRef.getBoundingClientRect().width) || 24;
             if (!diameter || diameter <= 0) {
@@ -1332,14 +1318,20 @@ n_ready(function(){
             }
             const gap = 12;
             const items = Array.from(parent.querySelectorAll('.hovercolor'));
+            if (items.length === 0) return;
+            let prevWidth = diameter;
+            let accLeft = baseLeft + prevWidth + gap;
             items.forEach((el, idx) => {
                 if (idx === 0) return;
                 stripTildaPositionAttrs(el);
                 // Ставим инлайновые стили с приоритетом !important, чтобы не перетиралось
                 el.style.setProperty('position', 'absolute', 'important');
                 el.style.setProperty('top', baseTop + 'px', 'important');
-                el.style.setProperty('left', (baseLeft + idx * (diameter + gap)) + 'px', 'important');
+                el.style.setProperty('left', accLeft + 'px', 'important');
                 el.dataset.colorClone = '1';
+                // Получаем реальную ширину элемента для следующей итерации
+                const width = Math.round(el.getBoundingClientRect().width) || diameter;
+                accLeft += width + gap;
             });
         }
 
@@ -1447,9 +1439,6 @@ n_ready(function(){
     
     // Функция для динамической инициализации размеров из каталога
     function initDynamicSizes() {
-        const storeContainer = document.querySelector('.t-store__prod-snippet__container');
-        if (!storeContainer) return;
-        
         // Ищем селект размера в каталоге
         const sizeSelect = Array.from(document.querySelectorAll('.t-product__option select')).find(select => {
             const optionTitle = select.closest('.t-product__option').querySelector('.t-product__option-title');
@@ -1503,6 +1492,51 @@ n_ready(function(){
         );
         existingClonesSize.forEach(el => el.remove());
         
+        // Хелпер: удалить тильдовские позиционные атрибуты
+        function stripTildaSizePositionAttrs(elem) {
+            const attrs = Array.from(elem.attributes).map(a => a.name);
+            attrs.forEach(name => {
+                if (/^data-field-(left|top|container|axisx|axisy|width|widthunits|height|heightunits|topunits|leftunits|pos|zindex|align|valign)-value$/.test(name)) {
+                    elem.removeAttribute(name);
+                }
+            });
+        }
+
+        // Хелпер: расставить клоны размеров справа от первого, с зазором 12px
+        function positionSizeClones() {
+            const first = firstSizeElement;
+            if (!first) return;
+            const parentRect = parent.getBoundingClientRect();
+            const firstRect = first.getBoundingClientRect();
+            const baseTop = Math.round(firstRect.top - parentRect.top + parent.scrollTop);
+            const baseLeft = Math.round(firstRect.left - parentRect.left + parent.scrollLeft);
+            const getWidth = (el) => {
+                // Используем сам элемент, а не внутренний, чтобы получить реальный размер с учетом всех стилей
+                let w = Math.round(el.getBoundingClientRect().width);
+                if (!w || w <= 0) {
+                    // Если не получается получить через getBoundingClientRect, используем computed style
+                    const computedWidth = window.getComputedStyle(el).width;
+                    w = parseInt(computedWidth || '24', 10) || 24;
+                }
+                return w;
+            };
+            const gap = 14;
+            const items = Array.from(parent.querySelectorAll('.hoversize'));
+            if (items.length === 0) return;
+            let prevWidth = getWidth(items[0]);
+            let accLeft = baseLeft + prevWidth + gap;
+            items.forEach((el, idx) => {
+                if (idx === 0) return;
+                stripTildaSizePositionAttrs(el);
+                const width = getWidth(el);
+                el.style.setProperty('position', 'absolute', 'important');
+                el.style.setProperty('top', baseTop + 'px', 'important');
+                el.style.setProperty('left', accLeft + 'px', 'important');
+                el.dataset.sizeClone = '1';
+                accLeft += width + gap;
+            });
+        }
+
         // Клонируем элементы для каждого размера
         let lastSizeElement = firstSizeElement;
         finalSizes.forEach((size, index) => {
@@ -1544,6 +1578,29 @@ n_ready(function(){
         
         // Перенос строки для размеров больше не добавляется, сохраняем исходную разметку Tilda
         
+        // Расставляем позиции размеров
+        positionSizeClones();
+        window.addEventListener('load', function(){
+            positionSizeClones();
+            let n = 6;
+            const id = setInterval(function(){
+                positionSizeClones();
+                if (--n <= 0) clearInterval(id);
+            }, 250);
+        });
+        window.addEventListener('resize', positionSizeClones);
+
+        // Наблюдаем за изменениями стилей и восстанавливаем позиции при правках Tilda
+        const sizeMo = new MutationObserver(function(mutations){
+            for (const m of mutations) {
+                if (m.type === 'attributes' && m.attributeName === 'style' && m.target.classList && m.target.classList.contains('hoversize')) {
+                    positionSizeClones();
+                    break;
+                }
+            }
+        });
+        sizeMo.observe(parent, { subtree: true, attributes: true, attributeFilter: ['style'] });
+
         // Синхронизируем первый размер с Tilda Store
         if (finalSizes.length > 0) {
             setTimeout(function() {
@@ -1574,8 +1631,15 @@ n_ready(function(){
         // Инициализируем динамические опции
     initDynamicOptions();
     
+    // Дополнительные вызовы после загрузки
+    window.addEventListener('load', function() {
+        setTimeout(initDynamicOptions, 100);
+        setTimeout(initDynamicOptions, 500);
+    });
+    
     // Инициализируем цветовые опции после загрузки DOM
     $(document).ready(function() {
+        initDynamicOptions();
         initColorOptions();
         initSizeOptions();
         
@@ -2077,17 +2141,18 @@ margin-left: 10px;
 .hoversize {
 cursor: pointer;
 border-radius: 50%;
-display: inline-flex !important;
+display: flex !important;
 align-items: center !important;
 justify-content: center !important;
 margin-right: 8px !important;
 position: relative !important;
-width: 30px !important;
-height: 30px !important;
+width: 24px !important;
+height: 24px !important;
 box-sizing: border-box !important;
 }
 .activesize {
-box-shadow: 0px 0px 0px 1px #000000 !important;
+box-shadow: 0px 0px 0px 3px #ffffff, 0px 0px 0px 4px #000000 !important;
+background-color: #ffffff;
 }
 /* Специальный стиль для "ПО МЕРКАМ" */
 .hoversize[data-size-value*="меркам"],
@@ -2095,13 +2160,18 @@ box-shadow: 0px 0px 0px 1px #000000 !important;
 width: 78px !important;
 height: 30px !important;
 border-radius: 2px !important;
-margin-top: -3px !important;
+margin-top: -4px !important;
+padding: 8px 4px !important;
+text-align: center !important;
+border: 1px solid transparent !important;
+box-sizing: border-box !important;
 }
 .hoversize[data-size-value*="меркам"].activesize,
 .hoversize[data-size-value*="мерка"].activesize {
 border: 1px solid #000000 !important;
-border-radius: 2px !important;
+border-radius: 5px !important;
 box-shadow: none !important;
+padding: 8px 4px !important;
 }
 /* Стили для внутреннего содержимого размеров */
 .hoversize .tn-atom {
@@ -2115,9 +2185,11 @@ line-height: 1.2 !important;
 white-space: nowrap !important;
 text-transform: uppercase !important;
 text-align: center !important;
-display: flex !important;
-align-items: center !important;
-justify-content: center !important;
+padding: 0 !important;
+margin: 0 !important;
+width: 100% !important;
+height: 100% !important;
+display: block !important;
 }
 /* Стили для внутреннего содержимого цветов */
 .hovercolor .tn-atom {
