@@ -1066,7 +1066,9 @@ n_ready(function(){
         'графитовый': '#555D68',
         'тёплый жёлтый': '#E7C01A',
         'теплый желтый': '#E7C01A',
-        'кирпичный': '#9F583A'
+        'кирпичный': '#9F583A',
+        'черный': '#000000',
+        'чёрный': '#000000'
     };
 
     function resolveHexForOption(optionEl, name) {
@@ -1088,7 +1090,52 @@ n_ready(function(){
         hex = extractHexFromString(styleAttr);
         if (hex) return hex;
 
-        // 5) фолбэк по имени
+        // 5) ИЩЕМ В ВИЗУАЛЬНЫХ ЭЛЕМЕНТАХ TILDA (checkmark) - это основной источник HEX из каталога
+        try {
+            const select = optionEl.parentElement;
+            if (select && select.tagName === 'SELECT') {
+                const optionContainer = select.closest('.t-product__option');
+                if (optionContainer) {
+                    // Сопоставляем по значению опции, а не по индексу - это надежнее
+                    const optionValue = optionEl.value || optionEl.text.trim();
+                    
+                    // Ищем label с input, у которого value совпадает со значением опции
+                    const labels = optionContainer.querySelectorAll('label.t-product__option-item');
+                    for (let i = 0; i < labels.length; i++) {
+                        const label = labels[i];
+                        const input = label.querySelector('input[type="radio"]');
+                        if (input && (input.value === optionValue || input.value === optionEl.text.trim())) {
+                            // Нашли соответствующий label, берем checkmark из него
+                            const checkmark = label.querySelector('.t-product__option-checkmark.t-product__option-checkmark_color');
+                            if (checkmark) {
+                                const checkmarkStyle = checkmark.getAttribute('style') || '';
+                                hex = extractHexFromString(checkmarkStyle);
+                                if (hex) return hex;
+                                
+                                // Также проверяем computed style
+                                const computedBg = window.getComputedStyle(checkmark).backgroundColor;
+                                if (computedBg && computedBg !== 'rgba(0, 0, 0, 0)' && computedBg !== 'transparent') {
+                                    // Конвертируем rgb/rgba в hex
+                                    const rgbMatch = computedBg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+                                    if (rgbMatch) {
+                                        const r = parseInt(rgbMatch[1]).toString(16).padStart(2, '0');
+                                        const g = parseInt(rgbMatch[2]).toString(16).padStart(2, '0');
+                                        const b = parseInt(rgbMatch[3]).toString(16).padStart(2, '0');
+                                        hex = `#${r}${g}${b}`.toUpperCase();
+                                        return hex;
+                                    }
+                                }
+                            }
+                            break; // Нашли нужный элемент, выходим
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('Error extracting hex from Tilda checkmark:', e);
+        }
+
+        // 6) фолбэк по имени (только если не нашли в каталоге)
         const key = String(name || '').trim().toLowerCase();
         return COLOR_NAME_TO_HEX[key] || null;
     }
