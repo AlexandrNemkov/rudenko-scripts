@@ -910,108 +910,10 @@ n_ready(function(){
         },1000); 
     } 
     // ========== ИНТЕГРАЦИЯ ЦВЕТОВЫХ ОПЦИЙ ==========
-    // Функция инициализации размеров
-    function initSizeOptions() {
-        // Ищем элементы размеров по аналогии с цветами
-        // Попробуем разные возможные ссылки для размеров
-        const sizeHrefSelectors = [
-            '[href="#sizeicon"]',
-            '[href="#size"]',
-            '[href="#размер"]',
-            '[href="#размерicon"]',
-            '[href*="size"]',
-            '[href*="размер"]'
-        ];
-        let sizeElements = [];
-        // Сначала ищем по конкретным ссылкам (как для цветов)
-        sizeHrefSelectors.forEach(selector => {
-            const elements = document.querySelectorAll(selector);
-            if (elements.length > 0) {
-                sizeElements = sizeElements.concat(Array.from(elements));
-            }
-        });
-        // Если не нашли по ссылкам, попробуем другие селекторы
-        if (sizeElements.length === 0) {
-            const sizeSelectors = [
-                '.t-store__prod-snippet__container .t-product__option[data-option-name*="размер"]',
-                '.t-store__prod-snippet__container .t-product__option[data-option-name*="size"]',
-                '.t-store__prod-snippet__container .t-product__option .t-input-group[data-field-name*="размер"]',
-                '.t-store__prod-snippet__container .t-product__option .t-input-group[data-field-name*="size"]'
-            ];
-            sizeSelectors.forEach(selector => {
-                const elements = document.querySelectorAll(selector);
-                if (elements.length > 0) {
-                    sizeElements = sizeElements.concat(Array.from(elements));
-                }
-            });
-        }
-        // Если не нашли через селекторы, попробуем найти по тексту
-        if (sizeElements.length === 0) {
-            const allOptions = document.querySelectorAll('.t-store__prod-snippet__container .t-product__option');
-            allOptions.forEach(option => {
-                const title = option.querySelector('.t-product__option-title');
-                if (title && (
-                    title.textContent.toLowerCase().includes('размер') || 
-                    title.textContent.toLowerCase().includes('size')
-                )) {
-                    const buttons = option.querySelectorAll('button, .t-input-group button, [role="button"]');
-                    sizeElements = sizeElements.concat(Array.from(buttons));
-                }
-            });
-        }
-        // Дополнительная диагностика - выводим все href на странице для поиска размеров
-        const allLinks = document.querySelectorAll('a[href]');
-        allLinks.forEach((link, index) => {
-            if (link.href && (
-                link.href.includes('size') || 
-                link.href.includes('размер') ||
-                link.href.includes('#') && link.textContent.match(/^\d+$/)
-            )) {
-            }
-        });
-        if (sizeElements.length > 0) {
-            // Добавляем класс для размеров
-            sizeElements.forEach((element, index) => {
-                element.classList.add('hoversize');
-                element.setAttribute('data-size-index', index);
-                // Пытаемся определить размер из текста элемента
-                const sizeText = element.textContent.trim() || element.innerText.trim();
-                if (sizeText && (/^\d+$/.test(sizeText) || sizeText.toLowerCase().includes('меркам') || sizeText.toLowerCase().includes('мерка'))) {
-                    element.setAttribute('data-size-value', sizeText);
-                }
-            });
-            // Устанавливаем активный размер (первый)
-            if (sizeElements[0]) {
-                sizeElements[0].classList.add('activesize');
-            }
-            // Привязываем обработчики клика для размеров
-            $('.hoversize').click(function(e) {
-                e.preventDefault();
-                const sizeIndex = $(this).attr('data-size-index');
-                const sizeValue = $(this).attr('data-size-value');
-                // Деактивируем все размеры
-                $('.hoversize').removeClass('activesize');
-                $(this).addClass('activesize');
-                // Синхронизируем с Tilda Store
-                if (sizeValue) {
-                    syncSizeWithStore(sizeValue);
-                } else {
-                    console.error('No size value found for element:', this);
-                }
-                return false;
-            });
-        }
-        // Если размеры не найдены автоматически, можно добавить их вручную
-        // Раскомментируйте и измените селектор, если знаете правильный href для размеров
-        /*
-        $('[href="#SIZE_HREF_HERE"]').addClass('hoversize');
-        $('.hoversize:eq(0)').addClass('activesize');
-        */
-    }
     // Функция синхронизации размера с Tilda Store
     function syncSizeWithStore(sizeValue) {
-        // Ищем селект с опцией размера
-        const allSelects = document.querySelectorAll('.t-store__prod-snippet__container .t-product__option select');
+        // Ищем селект с опцией размера (на странице товара и в каталоге)
+        const allSelects = document.querySelectorAll('.t-product__option select, .t-store__prod-snippet__container .t-product__option select, .js-store-product .t-product__option select');
         let sizeSelect = null;
         allSelects.forEach((select, index) => {
             const optionTitle = select.closest('.t-product__option').querySelector('.t-product__option-title');
@@ -1062,64 +964,10 @@ n_ready(function(){
             console.warn('No size select found');
         }
     }
-    // Функция инициализации цветовых опций
-    function initColorOptions() {
-        // Присваиваем классы элементам цветовых опций
-        $('[href = "#coloricon"]').addClass('hovercolor');
-        $('.hovercolor:eq(0)').addClass('activecolor');
-        $('[href = "#colortext"]').addClass('colortext');
-        $('[href = "#prodimg"]').addClass('prodimg');
-        $('[href = "#kankenclassicbutton"]').addClass('classicbutton');
-        // Задаём нужную ссылку для кнопки
-        $('.classicbutton').attr('href', '#order:Kanken Classic (Pink) = 3900:::image=https://static.tildacdn.com/tild3961-6237-4864-a232-386535633032/bag1.jpg');
-        // Устанавливаем начальный цвет (0-й элемент - это Розовый)
-        $('.colortext').text('Розовый').css('color', '#E5AAAC');
-        $('.colorname').text('Розовый');
-        // Функция деактивации всех цветов
-        function activecolor() { 
-            $('.hovercolor').removeClass('activecolor');
-        }
-        let number = 0;
-        // При клике на цвет
-        $(".hovercolor").click(function(e) {
-            e.preventDefault();
-            // Вычисляем номер нашего цвета        
-            number = $(".hovercolor").index(this);
-            activecolor();   
-            $(this).addClass('activecolor');
-            // Обновляем текст цвета в зависимости от выбранного цвета
-            // ИСПРАВЛЕННЫЙ ПОРЯДОК: 0-Розовый, 1-Графитовый, 2-Теплый желтый, 3-Кирпичный
-            if (number == 0) {
-                $('.colortext').text('Розовый').css('color', '#E5AAAC');
-                $('.colorname').text('Розовый');
-                // Синхронизируем с опцией товара в Tilda Store
-                syncColorWithStore('Розовый');
-            }
-            if (number == 1) {
-                $('.colortext').text('Графитовый').css('color', '#555D68');
-                $('.colorname').text('Графитовый');
-                // Синхронизируем с опцией товара в Tilda Store
-                syncColorWithStore('Графитовый');
-            }
-            if (number == 2) {
-                $('.colortext').text('Теплый желтый').css('color', '#E7C01A');
-                $('.colorname').text('Теплый желтый');
-                // Синхронизируем с опцией товара в Tilda Store
-                syncColorWithStore('Теплый желтый');
-            }
-            if (number == 3) {
-                $('.colortext').text('Кирпичный').css('color', '#9F583A');
-                $('.colorname').text('Кирпичный');
-                // Синхронизируем с опцией товара в Tilda Store
-                syncColorWithStore('Кирпичный');
-            }
-            return false;
-        });
-    }
     // Функция синхронизации выбора цвета с опциями товара в Tilda Store
     function syncColorWithStore(colorValue) {
-        // Ищем все селекты с опциями товара
-        const allSelects = document.querySelectorAll('.t-store__prod-snippet__container .t-product__option select');
+        // Ищем все селекты с опциями товара (на странице товара и в каталоге)
+        const allSelects = document.querySelectorAll('.t-product__option select, .t-store__prod-snippet__container .t-product__option select, .js-store-product .t-product__option select');
         let colorSelect = null;
         // Ищем селект с опцией цвета
         allSelects.forEach(select => {
@@ -1405,7 +1253,6 @@ n_ready(function(){
         
         // Устанавливаем начальный цвет и синхронизируем с Tilda Store
         if (colorItems.length > 0) {
-            $('.colortext').text(colorItems[0].name);
             $('.colorname').text(colorItems[0].name);
             
             // Вызываем синхронизацию первого цвета
@@ -1422,7 +1269,6 @@ n_ready(function(){
             
             const colorName = $(this).attr('data-color-name');
             const colorHex = $(this).attr('data-color-hex');
-            $('.colortext').text(colorName);
             $('.colorname').text(colorName);
             paintColorIcon(this, colorHex);
             // Пользователь выбрал цвет вручную — помечаем и отменяем авто-инициализацию
@@ -1640,8 +1486,6 @@ n_ready(function(){
     // Инициализируем цветовые опции после загрузки DOM
     $(document).ready(function() {
         initDynamicOptions();
-        initColorOptions();
-        initSizeOptions();
         
         // Автоматически выбираем первый цвет и размер при загрузке
         // Откладываем авто-выбор первого цвета/размера, но не вмешиваемся,
