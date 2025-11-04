@@ -1322,8 +1322,9 @@ n_ready(function(){
             if (!first) return;
             const parentRect = parent.getBoundingClientRect();
             const firstRect = first.getBoundingClientRect();
-            const baseTop = Math.round(firstRect.top - parentRect.top + parent.scrollTop);
-            const baseLeft = Math.round(firstRect.left - parentRect.left + parent.scrollLeft);
+            // Используем координаты окна, чтобы избежать NaN при отсутствии scrollTop/Left у родителя
+            const baseTop = Math.round(firstRect.top - parentRect.top + (parent.scrollTop || 0) + window.scrollY);
+            const baseLeft = Math.round(firstRect.left - parentRect.left + (parent.scrollLeft || 0) + window.scrollX);
             const innerRef = first.querySelector('.tn-atom') || first;
             let diameter = Math.round(innerRef.getBoundingClientRect().width) || 24;
             if (!diameter || diameter <= 0) {
