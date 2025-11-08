@@ -145,6 +145,54 @@
 				}
 			});
 		}
+
+		// Обновляем высоту артборда после того, как все элементы отрисуются
+		setTimeout(() => {
+			updateArtboardHeight(art);
+		}, 200);
+	}
+
+	function updateArtboardHeight(art) {
+		if (!art) return;
+
+		// Определяем последний элемент в зависимости от версии
+		const lastElementSelector = isMobile() 
+			? '.tn-group__1450750621176149470954286540'  // Мобильная версия
+			: '.tn-elem__1450750621176099069854427510';  // Десктоп версия
+
+		const rec = document.querySelector(SECTION_ID);
+		if (!rec) return;
+		const lastElement = rec.querySelector(lastElementSelector);
+		
+		if (!lastElement) {
+			console.log('Последний элемент не найден:', lastElementSelector);
+			return;
+		}
+
+		// Вычисляем нижнюю границу последнего элемента
+		const rect = lastElement.getBoundingClientRect();
+		const artRect = art.getBoundingClientRect();
+		const bottom = rect.bottom - artRect.top;
+
+		// Получаем box-sizing и padding из computed стилей
+		const computedStyle = window.getComputedStyle(art);
+		const boxSizing = computedStyle.boxSizing;
+		const paddingBottom = parseFloat(computedStyle.paddingBottom) || 0;
+		const paddingTop = parseFloat(computedStyle.paddingTop) || 0;
+
+		let newHeight;
+		if (boxSizing === 'border-box') {
+			// При border-box height включает padding, поэтому устанавливаем height = bottom + padding-bottom
+			newHeight = bottom + paddingBottom;
+		} else {
+			// При content-box height не включает padding, поэтому вычитаем padding-top и добавляем padding-bottom
+			newHeight = bottom - paddingTop + paddingBottom;
+		}
+		
+		if (newHeight > 0) {
+			art.style.height = Math.round(newHeight) + 'px';
+			console.log('Высота артборда обновлена:', newHeight, 'px, bottom:', bottom, 'box-sizing:', boxSizing, 'padding-bottom:', paddingBottom, 'элемент:', lastElementSelector);
+		}
 	}
 
 	let updateTimeout = null;
@@ -168,8 +216,28 @@
 		}
 
 		// Отслеживаем изменения размера окна
-		window.addEventListener('resize', scheduleUpdate);
-		window.addEventListener('orientationchange', scheduleUpdate);
+		window.addEventListener('resize', () => {
+			scheduleUpdate();
+			// Обновляем высоту артборда после изменения размера
+			const rec = document.querySelector(SECTION_ID);
+			if (rec) {
+				const art = rec.querySelector('.t396__artboard');
+				if (art) {
+					setTimeout(() => updateArtboardHeight(art), 500);
+				}
+			}
+		});
+		window.addEventListener('orientationchange', () => {
+			scheduleUpdate();
+			// Обновляем высоту артборда после изменения ориентации
+			const rec = document.querySelector(SECTION_ID);
+			if (rec) {
+				const art = rec.querySelector('.t396__artboard');
+				if (art) {
+					setTimeout(() => updateArtboardHeight(art), 600);
+				}
+			}
+		});
 
 		// Отслеживаем изменения текста (только содержимое, не стили)
 		const textObserver = new MutationObserver(() => {
@@ -199,6 +267,14 @@
 				// Инициализация успешна, запускаем обновление
 				updateLayout();
 				setupObservers();
+				// Обновляем высоту артборда после инициализации
+				const rec = document.querySelector(SECTION_ID);
+				if (rec) {
+					const art = rec.querySelector('.t396__artboard');
+					if (art) {
+						setTimeout(() => updateArtboardHeight(art), 800);
+					}
+				}
 			} else if (attempts < maxAttempts) {
 				// Текст еще не загружен, пробуем еще раз
 				setTimeout(attempt, delay);
@@ -225,6 +301,14 @@
 				tryInitializeWithRetry(3, 500);
 			} else {
 				updateLayout();
+				// Обновляем высоту артборда
+				const rec = document.querySelector(SECTION_ID);
+				if (rec) {
+					const art = rec.querySelector('.t396__artboard');
+					if (art) {
+						setTimeout(() => updateArtboardHeight(art), 900);
+					}
+				}
 			}
 		}, 3000);
 	});

@@ -433,6 +433,12 @@ n_ready(function(){
     } 
     function activateButton4e6c6l4f7y0l5n9s1q7() { 
         let buttonsList = document.querySelectorAll(zeroId + ' .' + addToCartBtnClass); 
+        // Добавляем мобильную кнопку корзины
+        const mobileCartButton = document.querySelector('.tn-elem__1527711121176244292346964490');
+        if (mobileCartButton) {
+            buttonsList = Array.from(buttonsList);
+            buttonsList.push(mobileCartButton);
+        }
         let leftover = document.querySelector('.t-store__prod-snippet__container .js-store-product')?.getAttribute('data-product-inv'); 
         const defaultOrderButton = document.querySelector('.t-store__prod-snippet__container a[href="#order"]'); 
         
@@ -452,6 +458,14 @@ n_ready(function(){
                         btn.innerText = 'Купить за ' + price;
                     }
                 });
+                // Обновляем текст мобильной кнопки корзины
+                const mobileCartBtnAtom = mobileCartButton?.querySelector('.tn-atom');
+                if (mobileCartBtnAtom) {
+                    const price = getPrice();
+                    if (price) {
+                        mobileCartBtnAtom.innerText = 'Купить за ' + price;
+                    }
+                }
             }
         };
         
@@ -527,6 +541,12 @@ n_ready(function(){
     function activateWishButton6z4s7y2e0x9n1x2r0h8() { 
         let addButtonList = document.querySelectorAll(zeroId + ' .' + addToWishBtnClass); 
         let removeButtonList = document.querySelectorAll(zeroId + ' .' + removeFromWishBtnClass); 
+        // Добавляем мобильную кнопку избранного
+        const mobileFavoriteButton = document.querySelector('.tn-elem__1527711121176244292347471240');
+        if (mobileFavoriteButton) {
+            addButtonList = Array.from(addButtonList);
+            addButtonList.push(mobileFavoriteButton);
+        }
         let intForFavoriteButton = setInterval(() => { 
             let favoriteButton = document.querySelector('.t-store__prod-snippet__container a[href="#addtofavorites"]'); 
             if (favoriteButton) { 
@@ -2051,7 +2071,7 @@ background-color: #ffffff;
 width: 78px !important;
 height: 30px !important;
 border-radius: 2px !important;
-margin-top: -3px !important;
+margin-top: -4px !important;
 padding: 8px 4px !important;
 text-align: center !important;
 border: 1px solid transparent !important;
