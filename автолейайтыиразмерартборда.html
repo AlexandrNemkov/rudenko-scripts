@@ -1,0 +1,243 @@
+<script>
+(function(){
+	const SECTION_ID = '#rec1450750621';
+	const TEXT_BLOCK_SELECTOR = '.tn-elem__1450750621176088924800187760';
+	const GAP_DESKTOP_PX = 34;
+	const GAP_MOBILE_PX = 32;
+	const PADDING_DESKTOP_PX = 64;
+	const PADDING_MOBILE_PX = 32;
+	const MOBILE_MAX_WIDTH = 480;
+
+	const ELEMENTS_TO_SHIFT = [
+		'.tn-elem__1450750621176088976184150060',
+		'.tn-elem__1450750621176088916682832740',
+		'.tn-elem__14507506211760889599435',
+		'.tn-elem__1450750621176094694267875720',
+		'.tn-elem__14507506211760889601665',
+		'.tn-elem__1450750621176099069856057160',
+		'.tn-elem__1450750621176099069855668790',
+		'.tn-elem__1450750621176099069855054510',
+		'.tn-elem__1450750621176099069858888290',
+		'.tn-elem__1450750621176099069854427510',
+		'.tn-group__1450750621176149458273049770',
+		'.tn-group__1450750621176149470954286540'
+	];
+
+	let isInitialized = false;
+	let initialTextHeight = 0;
+	let initialTextTop = 0;
+	let initialTextBottom = 0; // Нижняя граница текстового блока (top + height + gap)
+	let initialElementTops = {};
+
+	function isMobile() {
+		return window.innerWidth <= MOBILE_MAX_WIDTH;
+	}
+
+	function getElementPosition(element, container) {
+		const elemRect = element.getBoundingClientRect();
+		const contRect = container.getBoundingClientRect();
+		return {
+			top: elemRect.top - contRect.top,
+			height: elemRect.height
+		};
+	}
+
+	function hasTextContent(element) {
+		// Проверяем, что в элементе есть текст (не пустой)
+		const text = element.textContent || element.innerText || '';
+		return text.trim().length > 0;
+	}
+
+	function initialize() {
+		const rec = document.querySelector(SECTION_ID);
+		if (!rec) return false;
+		const art = rec.querySelector('.t396__artboard');
+		if (!art) return false;
+		const textBlock = rec.querySelector(TEXT_BLOCK_SELECTOR);
+		if (!textBlock) return false;
+
+		// Проверяем, что текст загрузился (есть содержимое)
+		if (!hasTextContent(textBlock)) {
+			return false; // Текст еще не загружен, ждем
+		}
+
+		// Сохраняем исходную высоту и позицию текстового блока
+		const textPos = getElementPosition(textBlock, art);
+		const gap = isMobile() ? GAP_MOBILE_PX : GAP_DESKTOP_PX;
+		initialTextHeight = textPos.height;
+		initialTextTop = textPos.top;
+		initialTextBottom = textPos.top + textPos.height + gap;
+
+		// Сохраняем исходные top всех элементов
+		ELEMENTS_TO_SHIFT.forEach(selector => {
+			const elem = rec.querySelector(selector);
+			if (elem) {
+				const computedStyle = window.getComputedStyle(elem);
+				const originalTop = elem.style.top || computedStyle.top;
+				initialElementTops[selector] = parseFloat(originalTop) || getElementPosition(elem, art).top;
+			}
+		});
+
+		isInitialized = true;
+		return true;
+	}
+
+	function updateLayout() {
+		const rec = document.querySelector(SECTION_ID);
+		if (!rec) return;
+		const art = rec.querySelector('.t396__artboard');
+		if (!art) return;
+		const textBlock = rec.querySelector(TEXT_BLOCK_SELECTOR);
+		if (!textBlock) return;
+
+		// Устанавливаем отступ снизу
+		art.style.paddingBottom = isMobile() ? PADDING_MOBILE_PX + 'px' : PADDING_DESKTOP_PX + 'px';
+
+		// Инициализация при первом запуске
+		if (!isInitialized) {
+			if (!initialize()) return;
+		}
+
+		// Получаем текущую высоту текстового блока
+		const textPos = getElementPosition(textBlock, art);
+		const currentTextHeight = textPos.height;
+		const gap = isMobile() ? GAP_MOBILE_PX : GAP_DESKTOP_PX;
+		
+		// Вычисляем разницу в высоте
+		const heightDiff = currentTextHeight - initialTextHeight;
+
+		// Находим первый элемент ниже текстового блока
+		let firstBelowElement = null;
+		let firstBelowTop = Infinity;
+		let firstBelowSelector = null;
+
+		ELEMENTS_TO_SHIFT.forEach(selector => {
+			const elem = rec.querySelector(selector);
+			if (!elem || !initialElementTops[selector]) return;
+			
+			const currentPos = getElementPosition(elem, art);
+			// Ищем элемент, который находится ниже текстового блока
+			if (currentPos.top > textPos.top && currentPos.top < firstBelowTop) {
+				firstBelowTop = currentPos.top;
+				firstBelowElement = elem;
+				firstBelowSelector = selector;
+			}
+		});
+
+		// Если нашли первый элемент ниже, вычисляем его новую позицию
+		if (firstBelowElement && firstBelowSelector) {
+			const newFirstBelowTop = textPos.top + currentTextHeight + gap;
+			const firstBelowOriginalTop = initialElementTops[firstBelowSelector];
+			const offset = firstBelowOriginalTop - firstBelowTop;
+
+			// Применяем сдвиг ко всем элементам ниже текстового блока
+			ELEMENTS_TO_SHIFT.forEach(selector => {
+				const elem = rec.querySelector(selector);
+				if (!elem || !initialElementTops[selector]) return;
+
+				const originalTop = initialElementTops[selector];
+				const currentPos = getElementPosition(elem, art);
+
+				// Если элемент ниже текстового блока, сдвигаем его
+				if (currentPos.top > textPos.top || originalTop > textPos.top) {
+					const newTop = originalTop + heightDiff;
+					elem.style.top = Math.round(newTop) + 'px';
+				}
+			});
+		}
+	}
+
+	let updateTimeout = null;
+	function scheduleUpdate() {
+		if (updateTimeout) clearTimeout(updateTimeout);
+		updateTimeout = setTimeout(updateLayout, 300);
+	}
+
+	function setupObservers() {
+		const rec = document.querySelector(SECTION_ID);
+		if (!rec) return;
+		const textBlock = rec.querySelector(TEXT_BLOCK_SELECTOR);
+		if (!textBlock) return;
+
+		// Используем ResizeObserver для отслеживания изменения размера текстового блока
+		if (window.ResizeObserver) {
+			const resizeObserver = new ResizeObserver(() => {
+				scheduleUpdate();
+			});
+			resizeObserver.observe(textBlock);
+		}
+
+		// Отслеживаем изменения размера окна
+		window.addEventListener('resize', scheduleUpdate);
+		window.addEventListener('orientationchange', scheduleUpdate);
+
+		// Отслеживаем изменения текста (только содержимое, не стили)
+		const textObserver = new MutationObserver(() => {
+			scheduleUpdate();
+		});
+		textObserver.observe(textBlock, {
+			childList: true,
+			subtree: true,
+			characterData: true
+		});
+	}
+
+	function tildaReady(fn) {
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', fn);
+		} else {
+			fn();
+		}
+	}
+
+	function tryInitializeWithRetry(maxAttempts, delay) {
+		let attempts = 0;
+		
+		function attempt() {
+			attempts++;
+			if (initialize()) {
+				// Инициализация успешна, запускаем обновление
+				updateLayout();
+				setupObservers();
+			} else if (attempts < maxAttempts) {
+				// Текст еще не загружен, пробуем еще раз
+				setTimeout(attempt, delay);
+			} else {
+				// Превышено количество попыток, все равно запускаем (на случай если текст пустой по дизайну)
+				updateLayout();
+				setupObservers();
+			}
+		}
+		
+		attempt();
+	}
+
+	tildaReady(function() {
+		// Увеличиваем задержку перед первой попыткой, чтобы другой скрипт успел загрузить данные
+		setTimeout(() => {
+			// Пробуем инициализировать с несколькими попытками
+			tryInitializeWithRetry(5, 500); // 5 попыток с интервалом 500ms
+		}, 1000); // Начальная задержка 1 секунда
+
+		// Дополнительная попытка через больший интервал
+		setTimeout(() => {
+			if (!isInitialized) {
+				tryInitializeWithRetry(3, 500);
+			} else {
+				updateLayout();
+			}
+		}, 3000);
+	});
+})();
+</script>
+
+<style>
+#rec1450750621 .t396__artboard { 
+	padding-bottom: 64px; 
+}
+@media screen and (max-width: 480px) {
+	#rec1450750621 .t396__artboard { 
+		padding-bottom: 32px; 
+	}
+}
+</style>
