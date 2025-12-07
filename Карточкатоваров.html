@@ -710,6 +710,10 @@ n_ready(function(){
                         let recId = zeroId.replace("#rec", ""); 
                         let elemId = document.querySelector(zeroId + ' [data-elem-type="gallery"]').getAttribute("data-elem-id"); 
                         t_zeroGallery__init(recId, elemId); 
+                        // Создаем галерею миниатюр после инициализации
+                        setTimeout(() => {
+                            createThumbnailGallery(imgList);
+                        }, 500);
                     } 
                 },100); 
                 setTimeout(() => { 
@@ -721,6 +725,148 @@ n_ready(function(){
             clearInterval(int4); 
         },7000) 
     } 
+    
+    // Функция для создания галереи миниатюр слева
+    function createThumbnailGallery(imgList) {
+        const galleryElement = document.querySelector(zeroId + ' [data-elem-type="gallery"]');
+        if (!galleryElement || imgList.length === 0) return;
+        
+        // Проверяем, не создана ли уже галерея миниатюр
+        if (galleryElement.parentNode.querySelector('.thumbnail-gallery-container')) return;
+        
+        // Создаем контейнер для миниатюр
+        const thumbnailContainer = document.createElement('div');
+        thumbnailContainer.className = 'thumbnail-gallery-container';
+        
+        // Создаем миниатюры для каждого изображения
+        imgList.forEach((imgUrl, index) => {
+            const thumbnail = document.createElement('div');
+            thumbnail.className = 'thumbnail-item';
+            if (index === 0) {
+                thumbnail.classList.add('active');
+            }
+            thumbnail.setAttribute('data-thumb-index', index);
+            
+            const thumbnailImg = document.createElement('img');
+            thumbnailImg.src = imgUrl;
+            thumbnailImg.alt = 'Thumbnail ' + (index + 1);
+            thumbnailImg.loading = 'lazy';
+            
+            thumbnail.appendChild(thumbnailImg);
+            thumbnailContainer.appendChild(thumbnail);
+            
+            // Добавляем обработчик клика
+            thumbnail.addEventListener('click', function() {
+                // Убираем активный класс со всех миниатюр
+                thumbnailContainer.querySelectorAll('.thumbnail-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                // Добавляем активный класс к выбранной миниатюре
+                thumbnail.classList.add('active');
+                
+                // Переключаем основное изображение в галерее
+                const galleryBullets = galleryElement.querySelectorAll('.t-slds__bullet');
+                if (galleryBullets[index]) {
+                    galleryBullets[index].click();
+                }
+            });
+        });
+        
+        // Обертываем галерею и миниатюры в контейнер, если его еще нет
+        let galleryWrapper = galleryElement.parentNode.querySelector('.gallery-wrapper');
+        if (!galleryWrapper) {
+            galleryWrapper = document.createElement('div');
+            galleryWrapper.className = 'gallery-wrapper';
+            galleryElement.parentNode.insertBefore(galleryWrapper, galleryElement);
+            galleryWrapper.appendChild(galleryElement);
+        }
+        
+        // Вставляем контейнер миниатюр перед галереей внутри обертки
+        galleryWrapper.insertBefore(thumbnailContainer, galleryElement);
+        
+        // Синхронизируем позицию миниатюр с галереей
+        function alignThumbnails() {
+            const galleryRect = galleryElement.getBoundingClientRect();
+            const wrapperRect = galleryWrapper.getBoundingClientRect();
+            const thumbnailRect = thumbnailContainer.getBoundingClientRect();
+            
+            // Вычисляем разницу в позиции
+            const galleryTopInWrapper = galleryRect.top - wrapperRect.top;
+            const thumbnailTopInWrapper = thumbnailRect.top - wrapperRect.top;
+            const offset = galleryTopInWrapper - thumbnailTopInWrapper;
+            
+            if (Math.abs(offset) > 1) {
+                thumbnailContainer.style.marginTop = offset + 'px';
+            }
+        }
+        
+        // Выравниваем после небольшой задержки, чтобы все стили применились
+        setTimeout(alignThumbnails, 50);
+        setTimeout(alignThumbnails, 200);
+        setTimeout(alignThumbnails, 500);
+        
+        // Функция для синхронизации активной миниатюры
+        function syncThumbnail(index) {
+            thumbnailContainer.querySelectorAll('.thumbnail-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const activeThumbnail = thumbnailContainer.querySelector(`[data-thumb-index="${index}"]`);
+            if (activeThumbnail) {
+                activeThumbnail.classList.add('active');
+            }
+        }
+        
+        // Синхронизируем активную миниатюру с текущим слайдом галереи
+        const galleryBullets = galleryElement.querySelectorAll('.t-slds__bullet');
+        galleryBullets.forEach((bullet, index) => {
+            bullet.addEventListener('click', function() {
+                syncThumbnail(index);
+            });
+        });
+        
+        // Также отслеживаем изменения через события слайдера
+        const gallerySlider = galleryElement.querySelector('.t-slds');
+        if (gallerySlider) {
+            const observer = new MutationObserver(function(mutations) {
+                const activeBullet = galleryElement.querySelector('.t-slds__bullet_active');
+                if (activeBullet) {
+                    const bulletIndex = Array.from(galleryBullets).indexOf(activeBullet);
+                    if (bulletIndex !== -1) {
+                        syncThumbnail(bulletIndex);
+                    }
+                }
+            });
+            
+            observer.observe(galleryElement, {
+                childList: true,
+                subtree: true,
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        }
+        
+        // На мобильной версии отключаем клики на левую/правую область для переключения
+        function disableGalleryAreaClicks() {
+            if (window.innerWidth <= 640) {
+                const galleryAreas = galleryElement.querySelectorAll('.t-slds__area');
+                galleryAreas.forEach(area => {
+                    // Отключаем pointer-events через CSS (уже сделано в стилях)
+                    area.style.pointerEvents = 'none';
+                    // Удаляем обработчики кликов, но оставляем touch события для свайпа
+                    area.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                    }, true);
+                });
+            }
+        }
+        
+        // Вызываем после инициализации галереи
+        setTimeout(disableGalleryAreaClicks, 600);
+        window.addEventListener('resize', disableGalleryAreaClicks);
+    }
+    
     setGallery2k7z8w6u5m7q9s1e9x6(); 
     function getProp1c4k5r9r8t7b2s6j9w8({ type, update = false }={}) { 
         if (type == "gallery") { 
@@ -2125,5 +2271,143 @@ text-align: center !important;
 }
 .tn-elem__1450750621176096459787649250 .tn-atom {
 text-align: center !important;
+}
+/* Стили для галереи миниатюр */
+.gallery-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 20px;
+    width: 100%;
+}
+.thumbnail-gallery-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 80px;
+    flex-shrink: 0;
+    align-items: flex-start;
+}
+.thumbnail-item {
+    width: 80px;
+    height: auto;
+    aspect-ratio: 9 / 16;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: #f5f5f5;
+    position: relative;
+    flex-shrink: 0;
+}
+.thumbnail-item:hover {
+    border-color: #000;
+    opacity: 0.8;
+}
+.thumbnail-item.active {
+    border-color: #000;
+    border-width: 2px;
+}
+.thumbnail-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+/* Контейнер для галереи с миниатюрами */
+#rec1450750621 [data-elem-type="gallery"] {
+    flex: 1;
+    min-width: 0;
+    align-self: flex-start;
+}
+/* Убираем отступы у элемента галереи и его родителей */
+#rec1450750621 .tn-elem__14507506211760950710118 {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+#rec1450750621 .tn-elem__14507506211760950710118 .tn-atom {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+/* Выравниваем миниатюры по верху с галереей */
+.thumbnail-gallery-container {
+    align-self: flex-start;
+}
+/* На мобильных устройствах: скрываем миниатюры, показываем точки внизу */
+@media (max-width: 640px) {
+    .gallery-wrapper {
+        flex-direction: column;
+        gap: 0;
+    }
+    /* Скрываем миниатюры на мобильной версии */
+    .thumbnail-gallery-container {
+        display: none !important;
+    }
+    /* Точки внутри изображения по дизайну из Figma */
+    #rec1450750621 [data-elem-type="gallery"] .t-slds {
+        position: relative !important;
+    }
+    #rec1450750621 [data-elem-type="gallery"] .t-slds__bullet_wrapper {
+        position: absolute !important;
+        bottom: 12px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 4px !important;
+        z-index: 10 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    /* Стили конкретно для точек - убираем обводку */
+    #rec1450750621 [data-elem-type="gallery"] .t-slds__bullet {
+        width: 6px !important;
+        height: 6px !important;
+        min-width: 6px !important;
+        min-height: 6px !important;
+        max-width: 6px !important;
+        max-height: 6px !important;
+        border-radius: 50% !important;
+        background-color: #2B2B2B !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        opacity: 0.3 !important;
+        flex-shrink: 0 !important;
+    }
+    #rec1450750621 [data-elem-type="gallery"] .t-slds__bullet_active {
+        width: 18px !important;
+        height: 6px !important;
+        min-width: 18px !important;
+        min-height: 6px !important;
+        max-width: 18px !important;
+        max-height: 6px !important;
+        border-radius: 3px !important;
+        background-color: #2B2B2B !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        opacity: 1 !important;
+    }
+    /* Отключаем клики на левую/правую область галереи для переключения, но оставляем touch для свайпа */
+    #rec1450750621 [data-elem-type="gallery"] .t-slds__area {
+        pointer-events: none;
+    }
+    /* Включаем клики и touch только на само изображение (для увеличения и свайпа) */
+    #rec1450750621 [data-elem-type="gallery"] .t-slds__item,
+    #rec1450750621 [data-elem-type="gallery"] .t-slds__bgimg {
+        pointer-events: auto;
+        touch-action: pan-y pinch-zoom;
+    }
+    /* Точки-индикаторы должны быть кликабельными */
+    #rec1450750621 .t-slds__bullet {
+        pointer-events: auto;
+    }
 }
 </style>
